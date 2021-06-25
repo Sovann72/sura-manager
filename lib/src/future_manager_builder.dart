@@ -41,7 +41,8 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
       setState(() {});
       if (widget.futureManager.hasError) {
         if (suraProvider?.onManagerError != null) {
-          suraProvider?.onManagerError?.call(widget.futureManager.error, context);
+          suraProvider?.onManagerError
+              ?.call(widget.futureManager.error, context);
         }
         widget.onError?.call(widget.futureManager.error);
       }
@@ -81,7 +82,8 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
       if (widget.loading != null) {
         return widget.loading!;
       }
-      return suraProvider?.loadingWidget ?? Center(child: CircularProgressIndicator());
+      return suraProvider?.loadingWidget ??
+          Center(child: CircularProgressIndicator());
     }
   }
 }

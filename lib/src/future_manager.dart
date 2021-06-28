@@ -172,6 +172,7 @@ class FutureManager<T> extends IManager<T> {
   @override
   void addError(dynamic error) {
     this._error = error;
+    this._data = null;
     notifyListeners();
   }
 

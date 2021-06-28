@@ -29,7 +29,8 @@ class _HomePageState extends State<NewPage> {
       await Future.delayed(Duration(seconds: 2));
       //Add 10 into our dataManager
       return 10;
-    })
+    });
+    super.initState();
   }
 
   @override
@@ -56,7 +57,7 @@ class _HomePageState extends State<NewPage> {
           return Text("My data: ${data}"),
         }
       ),
-    ),
+    );
   }
 }
 ```

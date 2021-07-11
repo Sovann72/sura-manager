@@ -8,9 +8,9 @@ import 'package:sura_flutter/sura_flutter.dart' as SuraFlutter;
 import 'callback.dart';
 import 'imanager.dart';
 
-///Previously call [BaseStream] or [BaseExtendBloc]
-///[AsyncSubjectManager] is a wrap around bloc pattern that use [rxdart]
-///[AsyncSubjectManager] provide a method [asyncOperation] to handle or call async function associated with rxdart's [BehaviorSubject]
+/// Previously call [BaseStream] or [BaseExtendBloc]
+/// [AsyncSubjectManager] is a wrap around bloc pattern that use [rxdart]
+/// [AsyncSubjectManager] provide a method [asyncOperation] to handle or call async function associated with rxdart's [BehaviorSubject]
 ///
 class AsyncSubjectManager<T> extends IManager<T> {
   late final BehaviorSubject<T?> _controller;
@@ -98,7 +98,7 @@ class AsyncSubjectManager<T> extends IManager<T> {
       bool shouldThrowError = throwError ?? false;
       //
       bool triggerError = true;
-      if (this._controller.hasValue) {
+      if (this.hasData) {
         triggerError = shouldReload;
       }
       try {

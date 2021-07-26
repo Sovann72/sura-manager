@@ -73,6 +73,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
     return Stack(
       alignment: Alignment.topCenter,
       children: [
+        buildWidgetByState(),
         if (widget.showProgressIndicatorWhenLoading) ...[
           ValueListenableBuilder<ManagerProcessingState>(
             valueListenable: widget.futureManager.processingState,
@@ -83,7 +84,6 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
             child: const RefreshProgressIndicator(),
           ),
         ],
-        buildWidgetByState(),
       ],
     );
   }

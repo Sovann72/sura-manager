@@ -1,3 +1,7 @@
+## [0.0.3+1] - 26 July 2021
+
+- fix FutureManager loading stack
+
 ## [0.0.3] - 26 July 2021
 
 - rework FutureManager state

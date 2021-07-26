@@ -1,3 +1,7 @@
+## [0.0.3] - 26 July 2021
+
+- rework FutureManager state
+
 ## [0.0.2] - 28 June 2021
 
 - Fix FutureManager addError doesn't trigger error

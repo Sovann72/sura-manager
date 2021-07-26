@@ -24,7 +24,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  FutureManager<int> dataManager = FutureManager();
+  FutureManager<int> dataManager = FutureManager(reloading: false);
 
   @override
   void initState() {
@@ -40,22 +40,27 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     //Use with FutureManagerBuilder
     return Scaffold(
-      appBar: AppBar(actions: [
-        IconButton(
-          icon: Icon(Icons.refresh),
-          onPressed: () {
-            //call our asyncOperation again
-            dataManager.refresh();
-          },
-        )
-      ]),
+      appBar: AppBar(
+        title: Text("FutureManager example"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              //call our asyncOperation again
+              dataManager.refresh();
+            },
+          ),
+        ],
+      ),
       body: FutureManagerBuilder<int>(
         futureManager: dataManager,
+        showProgressIndicatorWhenLoading: true,
         error: (error) => Text(error.toString()),
         loading: Center(child: CircularProgressIndicator()),
         ready: (context, data) {
+          print("Rebuild");
           //result: My data: 10
-          return Text("My data: $data");
+          return Center(child: Text("My data: $data"));
         },
       ),
     );

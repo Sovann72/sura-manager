@@ -52,21 +52,18 @@ class FutureManager<T> extends IManager<T> {
   Future<T>? future;
 
   ///
-  bool _isLoading = true;
   T? _data;
   dynamic _error;
+  ManagerViewState _viewState = ManagerViewState.loading;
+  ValueNotifier<ManagerProcessingState> _processingState = ValueNotifier(ManagerProcessingState.idle);
 
+  ManagerViewState get viewState => _viewState;
+  ValueNotifier<ManagerProcessingState> get processingState => _processingState;
   T? get data => _data;
-
   dynamic get error => _error;
 
   ///
   bool get hasData => _data != null;
-
-  bool get hasError => _error != null;
-
-  bool get isLoading => _isLoading;
-  //
 
   @override
   Widget when({
@@ -115,6 +112,9 @@ class FutureManager<T> extends IManager<T> {
       bool triggerError = true;
       if (hasData) {
         triggerError = shouldReload;
+        if (shouldReload == false) {
+          this._processingState.value = ManagerProcessingState.processing;
+        }
       }
       try {
         if (shouldReload) {
@@ -126,16 +126,19 @@ class FutureManager<T> extends IManager<T> {
           result = await successCallBack.call(result);
         }
         _data = result;
+        updateManagerState(ManagerViewState.done);
         return result;
       } catch (exception) {
-        if (triggerError) _error = exception;
+        if (triggerError) {
+          _error = exception;
+          updateManagerState(ManagerViewState.error);
+        }
         errorCallBack?.call(exception);
         if (shouldThrowError) {
           throw exception;
         }
         return null;
       } finally {
-        toggleLoading();
         onOperationDone?.call();
       }
     };
@@ -148,8 +151,17 @@ class FutureManager<T> extends IManager<T> {
     );
   }
 
-  void toggleLoading([bool value = false]) {
-    _isLoading = value;
+  void updateManagerState(ManagerViewState state) {
+    this._viewState = state;
+    if (state == ManagerViewState.done) {
+      this._processingState.value = ManagerProcessingState.ready;
+    }
+    if (state == ManagerViewState.error) {
+      this._processingState.value = ManagerProcessingState.error;
+    }
+    if (state == ManagerViewState.loading) {
+      this._processingState.value = ManagerProcessingState.processing;
+    }
     notifyListeners();
   }
 
@@ -163,17 +175,16 @@ class FutureManager<T> extends IManager<T> {
 
   @override
   void resetData() {
-    _isLoading = true;
-    _error = null;
-    _data = null;
-    notifyListeners();
+    this._error = null;
+    this._data = null;
+    updateManagerState(ManagerViewState.loading);
   }
 
   @override
   void addError(dynamic error) {
     this._error = error;
     this._data = null;
-    notifyListeners();
+    updateManagerState(ManagerViewState.error);
   }
 
   @override

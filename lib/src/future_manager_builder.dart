@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sura_flutter/sura_flutter.dart' as SuraFlutter;
+import 'package:sura_manager/sura_manager.dart';
 
 import 'future_manager.dart';
 
@@ -20,6 +21,8 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   ///A widget to show when [FutureManager] state is success
   final Widget Function(BuildContext, T) ready;
 
+  final bool showProgressIndicatorWhenLoading;
+
   /// A widget that build base on the state a [FutureManager]
   const FutureManagerBuilder({
     Key? key,
@@ -28,6 +31,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
     this.loading,
     this.error,
     this.onError,
+    this.showProgressIndicatorWhenLoading = false,
   }) : super(key: key);
   @override
   _FutureManagerBuilderState createState() => _FutureManagerBuilderState<T>();
@@ -36,13 +40,14 @@ class FutureManagerBuilder<T> extends StatefulWidget {
 class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
   //
   SuraFlutter.SuraProvider? suraProvider;
+
+  //
   void listener() {
     if (mounted) {
       setState(() {});
-      if (widget.futureManager.hasError) {
+      if (widget.futureManager.viewState == ManagerViewState.error) {
         if (suraProvider?.onManagerError != null) {
-          suraProvider?.onManagerError
-              ?.call(widget.futureManager.error, context);
+          suraProvider?.onManagerError?.call(widget.futureManager.error, context);
         }
         widget.onError?.call(widget.futureManager.error);
       }
@@ -65,25 +70,45 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
   Widget build(BuildContext context) {
     suraProvider = SuraFlutter.SuraProvider.of(context);
     //
-    if (widget.futureManager.hasData) {
-      return widget.ready(context, widget.futureManager.data!);
-    } else if (widget.futureManager.hasError) {
-      if (widget.error != null) {
-        return widget.error!(widget.futureManager.error);
-      }
-      return suraProvider?.errorWidget?.call(widget.futureManager.error) ??
-          Center(
-            child: Text(
-              widget.futureManager.error.toString(),
-              textAlign: TextAlign.center,
-            ),
-          );
-    } else {
-      if (widget.loading != null) {
-        return widget.loading!;
-      }
-      return suraProvider?.loadingWidget ??
-          Center(child: CircularProgressIndicator());
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        if (widget.showProgressIndicatorWhenLoading) ...[
+          ValueListenableBuilder<ManagerProcessingState>(
+            valueListenable: widget.futureManager.processingState,
+            builder: (context, value, child) {
+              if (value == ManagerProcessingState.processing) return child!;
+              return const SizedBox();
+            },
+            child: const RefreshProgressIndicator(),
+          ),
+        ],
+        buildWidgetByState(),
+      ],
+    );
+  }
+
+  Widget buildWidgetByState() {
+    switch (widget.futureManager.viewState) {
+      case ManagerViewState.loading:
+        if (widget.loading != null) {
+          return widget.loading!;
+        }
+        return suraProvider?.loadingWidget ?? Center(child: CircularProgressIndicator());
+
+      case ManagerViewState.error:
+        if (widget.error != null) {
+          return widget.error!(widget.futureManager.error);
+        }
+        return suraProvider?.errorWidget?.call(widget.futureManager.error) ??
+            Center(
+              child: Text(
+                widget.futureManager.error.toString(),
+                textAlign: TextAlign.center,
+              ),
+            );
+      case ManagerViewState.done:
+        return widget.ready(context, widget.futureManager.data!);
     }
   }
 }

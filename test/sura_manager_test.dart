@@ -31,21 +31,21 @@ void main() {
     expect(futureManager.error.runtimeType, HttpException);
   });
 
-  test("Test future manger with loading", () async {
-    int? value;
-    await futureManager.asyncOperation(() async {
-      await Future.delayed(Duration(seconds: 2));
-      return 10;
-    }, onSuccess: (data) {
-      value = data;
-      return value!;
-    });
-    expect(value, 10);
-    futureManager.refresh(reloading: false).then((value) {
-      expect(futureManager.isLoading, false);
-      futureManager.refresh(reloading: true);
-      expect(futureManager.isLoading, true);
-    });
-    expect(futureManager.isLoading, false);
-  });
+  // test("Test future manger with loading", () async {
+  //   int? value;
+  //   await futureManager.asyncOperation(() async {
+  //     await Future.delayed(Duration(seconds: 2));
+  //     return 10;
+  //   }, onSuccess: (data) {
+  //     value = data;
+  //     return value!;
+  //   });
+  //   expect(value, 10);
+  //   futureManager.refresh(reloading: false).then((value) {
+  //     expect(futureManager.isLoading, false);
+  //     futureManager.refresh(reloading: true);
+  //     expect(futureManager.isLoading, true);
+  //   });
+  //   expect(futureManager.isLoading, false);
+  // });
 }

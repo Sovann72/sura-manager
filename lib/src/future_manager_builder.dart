@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sura_flutter/sura_flutter.dart' as SuraFlutter;
+import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
 
 import 'future_manager.dart';
@@ -18,10 +18,11 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   /// A callback function that call when [FutureManager] state is error
   final void Function(dynamic)? onError;
 
+  ///A widget to show on top of this widget when refreshing
+  final Widget? onRefreshing;
+
   ///A widget to show when [FutureManager] state is success
   final Widget Function(BuildContext, T) ready;
-
-  final bool showProgressIndicatorWhenLoading;
 
   /// A widget that build base on the state a [FutureManager]
   const FutureManagerBuilder({
@@ -31,7 +32,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
     this.loading,
     this.error,
     this.onError,
-    this.showProgressIndicatorWhenLoading = false,
+    this.onRefreshing,
   }) : super(key: key);
   @override
   _FutureManagerBuilderState createState() => _FutureManagerBuilderState<T>();
@@ -39,16 +40,19 @@ class FutureManagerBuilder<T> extends StatefulWidget {
 
 class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
   //
-  SuraFlutter.SuraProvider? suraProvider;
+  SuraProvider? suraProvider;
 
   //
-  void listener() {
+  void managerListener() {
     if (mounted) {
       setState(() {});
-      if (widget.futureManager.viewState == ManagerViewState.error) {
-        if (suraProvider?.onManagerError != null) {
-          suraProvider?.onManagerError?.call(widget.futureManager.error, context);
-        }
+    }
+  }
+
+  void processStateListener() {
+    if (mounted) {
+      if (widget.futureManager.processingState.value ==
+          ManagerProcessState.error) {
         widget.onError?.call(widget.futureManager.error);
       }
     }
@@ -56,32 +60,35 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
 
   @override
   void initState() {
-    widget.futureManager.addListener(listener);
+    widget.futureManager.addListener(managerListener);
+    widget.futureManager.processingState.addListener(processStateListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    widget.futureManager.removeListener(listener);
+    widget.futureManager.removeListener(managerListener);
+    widget.futureManager.processingState.removeListener(processStateListener);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    suraProvider = SuraFlutter.SuraProvider.of(context);
+    suraProvider = SuraProvider.of(context);
     //
     return Stack(
       alignment: Alignment.topCenter,
       children: [
         buildWidgetByState(),
-        if (widget.showProgressIndicatorWhenLoading) ...[
-          ValueListenableBuilder<ManagerProcessingState>(
+        if (widget.onRefreshing != null &&
+            widget.futureManager.isRefreshing) ...[
+          ValueListenableBuilder<ManagerProcessState>(
             valueListenable: widget.futureManager.processingState,
             builder: (context, value, child) {
-              if (value == ManagerProcessingState.processing) return child!;
+              if (value == ManagerProcessState.processing) return child!;
               return const SizedBox();
             },
-            child: const RefreshProgressIndicator(),
+            child: widget.onRefreshing,
           ),
         ],
       ],
@@ -94,20 +101,22 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
         if (widget.loading != null) {
           return widget.loading!;
         }
-        return suraProvider?.loadingWidget ?? Center(child: CircularProgressIndicator());
+        return suraProvider?.loadingWidget ??
+            Center(child: CircularProgressIndicator());
 
       case ManagerViewState.error:
         if (widget.error != null) {
           return widget.error!(widget.futureManager.error);
         }
-        return suraProvider?.errorWidget?.call(widget.futureManager.error) ??
+        return suraProvider?.errorWidget?.call(
+                widget.futureManager.error, widget.futureManager.refresh) ??
             Center(
               child: Text(
                 widget.futureManager.error.toString(),
                 textAlign: TextAlign.center,
               ),
             );
-      case ManagerViewState.done:
+      case ManagerViewState.ready:
         return widget.ready(context, widget.futureManager.data!);
     }
   }

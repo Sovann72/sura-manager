@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:sura_manager/src/callback.dart';
+import 'package:sura_manager/src/type.dart';
 
 abstract class IManager<T> extends ChangeNotifier {
   ///Perform async function in manager

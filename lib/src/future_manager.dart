@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sura_manager/src/imanager.dart';
 
-import 'callback.dart';
+import 'type.dart';
 import 'future_manager_builder.dart';
 
 ///This class is inspired from SWR in React
@@ -55,15 +55,16 @@ class FutureManager<T> extends IManager<T> {
   T? _data;
   dynamic _error;
   ManagerViewState _viewState = ManagerViewState.loading;
-  ValueNotifier<ManagerProcessingState> _processingState = ValueNotifier(ManagerProcessingState.idle);
+  ValueNotifier<ManagerProcessState> _processingState =
+      ValueNotifier(ManagerProcessState.idle);
 
   ManagerViewState get viewState => _viewState;
-  ValueNotifier<ManagerProcessingState> get processingState => _processingState;
+  ValueNotifier<ManagerProcessState> get processingState => _processingState;
   T? get data => _data;
   dynamic get error => _error;
 
   ///
-  bool get hasData => _data != null;
+  bool get isRefreshing => _data != null || _error != null;
 
   @override
   Widget when({
@@ -80,6 +81,7 @@ class FutureManager<T> extends IManager<T> {
   }
 
   ///refresh is a function that call [asyncOperation] again,
+  ///but doesn't reserve configuration
   ///return null if [futureFunction] hasn't been initialize
   Future<T?> Function({
     bool? reloading,
@@ -110,28 +112,29 @@ class FutureManager<T> extends IManager<T> {
       bool? shouldThrowError = throwError ?? false;
       //
       bool triggerError = true;
-      if (hasData) {
+      if (isRefreshing) {
         triggerError = shouldReload;
-        if (shouldReload == false) {
-          this._processingState.value = ManagerProcessingState.processing;
-        }
       }
       try {
         if (shouldReload) {
           this.resetData();
+        } else {
+          this.updateManagerProcessState(ManagerProcessState.processing);
         }
         future = futureFunction.call();
         T result = await future!;
         if (successCallBack != null) {
           result = await successCallBack.call(result);
         }
-        _data = result;
-        updateManagerState(ManagerViewState.done);
+        this.updateData(result);
         return result;
       } catch (exception) {
         if (triggerError) {
-          _error = exception;
-          updateManagerState(ManagerViewState.error);
+          this.addError(exception);
+        } else {
+          ///This line doesn't update UI, only provide error and update process state
+          this._error = exception;
+          updateManagerProcessState(ManagerProcessState.error);
         }
         errorCallBack?.call(exception);
         if (shouldThrowError) {
@@ -151,46 +154,45 @@ class FutureManager<T> extends IManager<T> {
     );
   }
 
-  void updateManagerState(ManagerViewState state) {
+  void updateManagerViewState(ManagerViewState state) {
     this._viewState = state;
-    if (state == ManagerViewState.done) {
-      this._processingState.value = ManagerProcessingState.ready;
-    }
-    if (state == ManagerViewState.error) {
-      this._processingState.value = ManagerProcessingState.error;
-    }
-    if (state == ManagerViewState.loading) {
-      this._processingState.value = ManagerProcessingState.processing;
-    }
     notifyListeners();
+  }
+
+  void updateManagerProcessState(ManagerProcessState state) {
+    this._processingState.value = state;
   }
 
   @override
   void updateData(T? data) {
     if (data != null) {
       _data = data;
+      updateManagerProcessState(ManagerProcessState.ready);
+      updateManagerViewState(ManagerViewState.ready);
     }
-    notifyListeners();
   }
 
   @override
   void resetData() {
     this._error = null;
     this._data = null;
-    updateManagerState(ManagerViewState.loading);
+    updateManagerViewState(ManagerViewState.loading);
+    updateManagerProcessState(ManagerProcessState.processing);
   }
 
   @override
   void addError(dynamic error) {
     this._error = error;
     this._data = null;
-    updateManagerState(ManagerViewState.error);
+    updateManagerViewState(ManagerViewState.error);
+    updateManagerProcessState(ManagerProcessState.error);
   }
 
   @override
   void dispose() {
     _data = null;
     _error = null;
+    _processingState.dispose();
     super.dispose();
   }
 }

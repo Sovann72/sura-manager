@@ -1,3 +1,7 @@
+## [0.0.4] - 29 July 2021
+
+- add refreshing widget to FutureManagerBuilder
+
 ## [0.0.3+1] - 26 July 2021
 
 - fix FutureManager loading stack

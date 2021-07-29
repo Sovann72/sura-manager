@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:sura_flutter/sura_flutter.dart' as SuraFlutter;
+import 'package:sura_flutter/sura_flutter.dart';
 
-import 'callback.dart';
+import 'type.dart';
 import 'imanager.dart';
 
 /// Previously call [BaseStream] or [BaseExtendBloc]
@@ -73,7 +73,7 @@ class AsyncSubjectManager<T> extends IManager<T> {
     Widget? loading,
     Widget Function(dynamic)? error,
   }) {
-    return SuraFlutter.SuraStreamHandler<T?>(
+    return SuraStreamHandler<T?>(
       stream: stream,
       ready: (data) => ready(data!),
       loading: loading,

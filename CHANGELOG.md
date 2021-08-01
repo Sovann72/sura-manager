@@ -1,3 +1,7 @@
+## [0.0.5] - 1 Ausgust 2021
+
+- add hasData method back to FutureManager
+
 ## [0.0.4] - 29 July 2021
 
 - add refreshing widget to FutureManagerBuilder

@@ -1,6 +1,6 @@
 name: sura_manager
 description: A class implementation to handle async value with Flutter widget
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/asurraa/sura_manager
 
 environment:

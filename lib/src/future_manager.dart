@@ -65,6 +65,7 @@ class FutureManager<T> extends IManager<T> {
 
   ///
   bool get isRefreshing => _data != null || _error != null;
+  bool get hasData => _data != null;
 
   @override
   Widget when({
@@ -119,7 +120,7 @@ class FutureManager<T> extends IManager<T> {
         if (shouldReload) {
           this.resetData();
         } else {
-          this.updateManagerProcessState(ManagerProcessState.processing);
+          this._updateManagerProcessState(ManagerProcessState.processing);
         }
         future = futureFunction.call();
         T result = await future!;
@@ -134,7 +135,7 @@ class FutureManager<T> extends IManager<T> {
         } else {
           ///This line doesn't update UI, only provide error and update process state
           this._error = exception;
-          updateManagerProcessState(ManagerProcessState.error);
+          _updateManagerProcessState(ManagerProcessState.error);
         }
         errorCallBack?.call(exception);
         if (shouldThrowError) {
@@ -154,12 +155,12 @@ class FutureManager<T> extends IManager<T> {
     );
   }
 
-  void updateManagerViewState(ManagerViewState state) {
+  void _updateManagerViewState(ManagerViewState state) {
     this._viewState = state;
     notifyListeners();
   }
 
-  void updateManagerProcessState(ManagerProcessState state) {
+  void _updateManagerProcessState(ManagerProcessState state) {
     this._processingState.value = state;
   }
 
@@ -167,8 +168,8 @@ class FutureManager<T> extends IManager<T> {
   void updateData(T? data) {
     if (data != null) {
       _data = data;
-      updateManagerProcessState(ManagerProcessState.ready);
-      updateManagerViewState(ManagerViewState.ready);
+      _updateManagerProcessState(ManagerProcessState.ready);
+      _updateManagerViewState(ManagerViewState.ready);
     }
   }
 
@@ -176,16 +177,16 @@ class FutureManager<T> extends IManager<T> {
   void resetData() {
     this._error = null;
     this._data = null;
-    updateManagerViewState(ManagerViewState.loading);
-    updateManagerProcessState(ManagerProcessState.processing);
+    _updateManagerViewState(ManagerViewState.loading);
+    _updateManagerProcessState(ManagerProcessState.processing);
   }
 
   @override
   void addError(dynamic error) {
     this._error = error;
     this._data = null;
-    updateManagerViewState(ManagerViewState.error);
-    updateManagerProcessState(ManagerProcessState.error);
+    _updateManagerViewState(ManagerViewState.error);
+    _updateManagerProcessState(ManagerProcessState.error);
   }
 
   @override

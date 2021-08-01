@@ -102,7 +102,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
           return widget.loading!;
         }
         return suraProvider?.loadingWidget ??
-            Center(child: CircularProgressIndicator());
+            const Center(child: const CircularProgressIndicator());
 
       case ManagerViewState.error:
         if (widget.error != null) {

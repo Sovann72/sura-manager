@@ -66,6 +66,7 @@ class FutureManager<T> extends IManager<T> {
   ///
   bool get isRefreshing => _data != null || _error != null;
   bool get hasData => _data != null;
+  bool _disposed = false;
 
   @override
   Widget when({
@@ -156,11 +157,13 @@ class FutureManager<T> extends IManager<T> {
   }
 
   void _updateManagerViewState(ManagerViewState state) {
+    if(_disposed) return;
     this._viewState = state;
     notifyListeners();
   }
 
   void _updateManagerProcessState(ManagerProcessState state) {
+    if(_disposed) return;
     this._processingState.value = state;
   }
 
@@ -194,6 +197,7 @@ class FutureManager<T> extends IManager<T> {
     _data = null;
     _error = null;
     _processingState.dispose();
+    _disposed = true;
     super.dispose();
   }
 }

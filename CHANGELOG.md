@@ -1,3 +1,7 @@
+## [0.0.6] - 12 Ausgust 2021
+
+- fix issue [#1](https://github.com/asurraa/sura_manager/issues/1)
+
 ## [0.0.5] - 1 Ausgust 2021
 
 - add hasData method back to FutureManager

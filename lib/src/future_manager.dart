@@ -157,13 +157,13 @@ class FutureManager<T> extends IManager<T> {
   }
 
   void _updateManagerViewState(ManagerViewState state) {
-    if(_disposed) return;
+    if (_disposed) return;
     this._viewState = state;
     notifyListeners();
   }
 
   void _updateManagerProcessState(ManagerProcessState state) {
-    if(_disposed) return;
+    if (_disposed) return;
     this._processingState.value = state;
   }
 

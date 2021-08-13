@@ -79,7 +79,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        buildWidgetByState(),
+        _buildWidgetByState(),
         if (widget.onRefreshing != null &&
             widget.futureManager.isRefreshing) ...[
           ValueListenableBuilder<ManagerProcessState>(
@@ -95,7 +95,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
     );
   }
 
-  Widget buildWidgetByState() {
+  Widget _buildWidgetByState() {
     switch (widget.futureManager.viewState) {
       case ManagerViewState.loading:
         if (widget.loading != null) {

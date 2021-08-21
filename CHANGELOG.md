@@ -1,3 +1,7 @@
+## [0.0.8] - 21 August 2021
+
+- Update sura_flutter package
+
 ## [0.0.7] - 21 August 2021
 
 - Update sura_flutter package

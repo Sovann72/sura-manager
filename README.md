@@ -2,7 +2,7 @@
 
 An class implementation to handle async value with Flutter widget
 
-[![pub package](https://img.shields.io/badge/pub-0.0.7-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
+[![pub package](https://img.shields.io/badge/pub-0.0.8-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 
 # Installation
 
@@ -10,7 +10,7 @@ Add this to pubspec.yaml
 
 ```dart
 dependencies:
-  sura_manager: ^0.0.7
+  sura_manager: ^0.0.8
 ```
 
 # Manager

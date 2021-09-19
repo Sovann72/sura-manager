@@ -1,3 +1,8 @@
+## [0.0.9] - 19 September 2021
+
+- Update sura_flutter package
+- Expose SuraProvider from sura_flutter
+
 ## [0.0.8] - 21 August 2021
 
 - Update sura_flutter package

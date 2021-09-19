@@ -2,6 +2,7 @@ name: sura_manager_example
 description: Sura Manager example
 
 version: 1.0.0+1
+publish_to: "none"
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

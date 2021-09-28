@@ -66,6 +66,7 @@ class FutureManager<T> extends IManager<T> {
   ///
   bool get isRefreshing => _data != null || _error != null;
   bool get hasData => _data != null;
+  bool get hasError => _error != null;
   bool _disposed = false;
 
   @override
@@ -136,6 +137,7 @@ class FutureManager<T> extends IManager<T> {
         } else {
           ///This line doesn't update UI, only provide error and update process state
           this._error = exception;
+          this.updateData(_data);
           _updateManagerProcessState(ManagerProcessState.error);
         }
         errorCallBack?.call(exception);

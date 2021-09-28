@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   rxdart: ^0.27.0
-  sura_flutter: ^0.4.2
+  sura_flutter: ^0.4.3
 
 dev_dependencies:
   flutter_test:

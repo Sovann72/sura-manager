@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sura_manager/src/imanager.dart';
 
-import 'type.dart';
 import 'future_manager_builder.dart';
+import 'type.dart';
 
 ///This class is inspired from SWR in React
 ///[FutureManager] is a wrap around [Future] and [ChangeNotifier]
@@ -137,7 +137,7 @@ class FutureManager<T> extends IManager<T> {
         } else {
           ///This line doesn't update UI, only provide error and update process state
           this._error = exception;
-          this.updateData(_data);
+          _updateManagerViewState(ManagerViewState.ready);
           _updateManagerProcessState(ManagerProcessState.error);
         }
         errorCallBack?.call(exception);
@@ -173,6 +173,7 @@ class FutureManager<T> extends IManager<T> {
   void updateData(T? data) {
     if (data != null) {
       _data = data;
+      _error = null;
       _updateManagerProcessState(ManagerProcessState.ready);
       _updateManagerViewState(ManagerViewState.ready);
     }

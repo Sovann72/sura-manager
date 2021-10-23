@@ -1,7 +1,11 @@
+## [0.1.1] - 23 October 2021
+
+- Fix a bug where Manager has a data but error isn't null, This lead to some inccrrect widget build since our error still exist in some way
+
 ## [0.1.0] - 28 September 2021
 
 - update ManagerViewState when there is an error and reloading is false, This feature keep the view as previous state, just update the listener only.
-    - use case: when we want to refresh the data without reloading the view and got an error, but need to rebuild the FutureManagerBuilder's child with current state.
+  - use case: when we want to refresh the data without reloading the view and got an error, but need to rebuild the FutureManagerBuilder's child with current state.
 
 ## [0.0.9] - 19 September 2021
 

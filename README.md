@@ -1,6 +1,6 @@
 # Sura Manager
 
-An class implementation to handle async value with Flutter widget
+A custom ValueNotifier and ValueListenableBuilder that support asynchronus value handling.
 
 [![pub package](https://img.shields.io/badge/pub-0.1.1-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 

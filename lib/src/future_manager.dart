@@ -98,6 +98,7 @@ class FutureManager<T> extends IManager<T> {
     return null;
   };
 
+
   @override
   Future<T?> asyncOperation(
     FutureFunction<T> futureFunction, {
@@ -169,6 +170,17 @@ class FutureManager<T> extends IManager<T> {
     this._processingState.value = state;
   }
 
+
+  ///Similar to [updateData] but provide current [data] in Manager as a param
+  void modifyData(FutureOr<T> Function(T?) onChange){
+    T? data = await onChange(_data);
+    updateData(data);
+  }
+
+
+  ///Update current data in our Manager
+  ///Ignore if data is null
+  ///Use [resetData] instead if you want to reset to [loading] state
   @override
   void updateData(T? data) {
     if (data != null) {
@@ -179,6 +191,8 @@ class FutureManager<T> extends IManager<T> {
     }
   }
 
+
+  ///Reset all [data] and [error] to [loading] state
   @override
   void resetData() {
     this._error = null;
@@ -187,6 +201,8 @@ class FutureManager<T> extends IManager<T> {
     _updateManagerProcessState(ManagerProcessState.processing);
   }
 
+
+  ///Add [error] our current manager, reset current [data] to null
   @override
   void addError(dynamic error) {
     this._error = error;

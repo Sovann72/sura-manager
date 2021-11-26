@@ -21,7 +21,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   ///A widget to show on top of this widget when refreshing
   final Widget? onRefreshing;
 
-  ///A widget to show when [FutureManager] state is success
+  ///A widget to show when [FutureManager] has a data
   final Widget Function(BuildContext, T) ready;
 
   /// A widget that build base on the state a [FutureManager]

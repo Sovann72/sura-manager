@@ -1,3 +1,8 @@
+## [0.1.2] - 26 November 2021
+
+- add modifyData function to FutureManager
+- improve documentation
+
 ## [0.1.1] - 23 October 2021
 
 - Fix a bug where Manager has a data but error isn't null, This lead to some inccrrect widget build since our error still exist in some way

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sura_flutter/sura_flutter.dart';
@@ -42,22 +40,22 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int count = 0;
-  late final FutureManager<int> dataManager;
+  late FutureManager<int> dataManager = FutureManager(
+    reloading: true,
+    onError: (err) {
+      print("error");
+      count = 0;
+    },
+  );
 
   @override
   void initState() {
-    dataManager = FutureManager(
-      reloading: true,
-      onError: (err) {
-        print("error");
-        count = 0;
-      },
-    );
     dataManager.asyncOperation(() async {
       count += 1;
       print("Count: $count");
       await Future.delayed(Duration(milliseconds: 1200));
-      bool error = Random().nextBool();
+      bool error = true;
+      //Random().nextBool();
       print("Is error? $error");
       if (error) throw "Error while getting data";
       return 10;
@@ -81,6 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
+          IconButton(
+            icon: Icon(Icons.add_a_photo),
+            onPressed: () {
+              dataManager.modifyData((data) {
+                int newData = data ?? 0 + 10;
+                return newData;
+              });
+            },
+          ),
         ],
       ),
       body: FutureManagerBuilder<int>(
@@ -93,7 +100,22 @@ class _MyHomePageState extends State<MyHomePage> {
         ready: (context, data) {
           print("Rebuild");
           //result: My data: 10
-          return Center(child: Text("My data: $data"));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("My data: $data"),
+                ElevatedButton(
+                    onPressed: () {
+                      dataManager.modifyData((data) {
+                        print(data);
+                        return data! + 10;
+                      });
+                    },
+                    child: Text("Update")),
+              ],
+            ),
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(

@@ -168,6 +168,11 @@ class FutureManager<T> extends IManager<T> {
 
   void _updateManagerProcessState(ManagerProcessState state) {
     if (_disposed) return;
+
+    ///notify the ValueNotifier because it doesbn't update if data is the same
+    if (this._processingState.value == state) {
+      this._processingState.notifyListeners();
+    }
     this._processingState.value = state;
   }
 

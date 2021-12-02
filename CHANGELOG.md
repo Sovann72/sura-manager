@@ -1,3 +1,7 @@
+## [0.1.3] - 02 December 2021
+
+- add onReady and add support for SuraProvider onManagerError
+
 ## [0.1.2] - 26 November 2021
 
 - add modifyData function to FutureManager

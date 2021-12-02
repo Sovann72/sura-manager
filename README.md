@@ -2,7 +2,7 @@
 
 A custom ValueNotifier and ValueListenableBuilder that support asynchronus value handling.
 
-[![pub package](https://img.shields.io/badge/pub-0.1.2-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
+[![pub package](https://img.shields.io/badge/pub-0.1.3-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 
 # Installation
 
@@ -10,7 +10,7 @@ Add this to pubspec.yaml
 
 ```dart
 dependencies:
-  sura_manager: ^0.1.2
+  sura_manager: ^0.1.3
 ```
 
 # FutureManager
@@ -97,4 +97,5 @@ class _HomePageState extends State<NewPage> {
 | loading | A widget show when [FutureManager] state is loading | CircularProgressIndicator |
 | error | A widget show when [FutureManager] state is error | Text(error.toString()) |
 | onError | A callback function that call when [FutureManager] state is error | null |
+| onReady | A callback function that call when [FutureManager] state has a data | null |
 | onRefreshing | A widget to show on top of this widget when refreshing | null |

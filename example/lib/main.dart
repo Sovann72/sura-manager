@@ -39,25 +39,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int count = 0;
   late FutureManager<int> dataManager = FutureManager(
     reloading: true,
-    onError: (err) {
-      print("error");
-      count = 0;
-    },
+    onError: (err) {},
   );
 
   @override
   void initState() {
     dataManager.asyncOperation(() async {
-      count += 1;
-      print("Count: $count");
-      await Future.delayed(Duration(milliseconds: 1200));
-      bool error = true;
+      await Future.delayed(Duration(milliseconds: 1500));
+      bool error = false;
       //Random().nextBool();
-      print("Is error? $error");
       if (error) throw "Error while getting data";
+      print("Get data done");
       return 10;
     });
     super.initState();
@@ -97,18 +91,20 @@ class _MyHomePageState extends State<MyHomePage> {
         onError: (err) {
           print("We got an error: $err");
         },
+        onReady: (data) {
+          print("We got a data: $data");
+        },
         ready: (context, data) {
           print("Rebuild");
-          //result: My data: 10
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("My data: $data"),
+                const SpaceY(24),
                 ElevatedButton(
                     onPressed: () {
                       dataManager.modifyData((data) {
-                        print(data);
                         return data! + 10;
                       });
                     },

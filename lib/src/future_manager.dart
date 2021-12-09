@@ -139,7 +139,6 @@ class FutureManager<T> extends IManager<T> {
         } else {
           ///This line doesn't update UI, only provide error and update process state
           this._error = exception;
-          _updateManagerViewState(ManagerViewState.ready);
           _updateManagerProcessState(ManagerProcessState.error);
         }
         errorCallBack?.call(exception);
@@ -169,7 +168,7 @@ class FutureManager<T> extends IManager<T> {
   void _updateManagerProcessState(ManagerProcessState state) {
     if (_disposed) return;
 
-    ///notify the ValueNotifier because it doesbn't update if data is the same
+    ///notify the ValueNotifier because it doesn't update if data is the same
     if (this._processingState.value == state) {
       this._processingState.notifyListeners();
     }

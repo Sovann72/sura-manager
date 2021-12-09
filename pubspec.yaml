@@ -1,6 +1,6 @@
 name: sura_manager
 description: A custom ValueNotifier and ValueListenableBuilder that support asynchronus value handling.
-version: 0.1.3
+version: 0.1.4
 homepage: https://github.com/asurraa/sura_manager
 
 environment:

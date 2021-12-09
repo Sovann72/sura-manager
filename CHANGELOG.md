@@ -1,3 +1,7 @@
+## [0.1.4] - 09 December 2021
+
+- Fix issue #2
+
 ## [0.1.3] - 02 December 2021
 
 - add onReady and add support for SuraProvider onManagerError

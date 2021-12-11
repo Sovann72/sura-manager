@@ -121,11 +121,7 @@ class FutureManager<T> extends IManager<T> {
         triggerError = shouldReload;
       }
       try {
-        if (shouldReload) {
-          this.resetData();
-        } else {
-          this._updateManagerProcessState(ManagerProcessState.processing);
-        }
+        this.resetData(updateViewState: shouldReload);
         future = futureFunction.call();
         T result = await future!;
         if (successCallBack != null) {
@@ -134,13 +130,8 @@ class FutureManager<T> extends IManager<T> {
         this.updateData(result);
         return result;
       } catch (exception) {
-        if (triggerError) {
-          this.addError(exception);
-        } else {
-          ///This line doesn't update UI, only provide error and update process state
-          this._error = exception;
-          _updateManagerProcessState(ManagerProcessState.error);
-        }
+        ///Only update viewState if [triggerError] is true
+        this.addError(exception, updateViewState: triggerError);
         errorCallBack?.call(exception);
         if (shouldThrowError) {
           throw exception;
@@ -198,19 +189,27 @@ class FutureManager<T> extends IManager<T> {
 
   ///Reset all [data] and [error] to [loading] state
   @override
-  void resetData() {
-    this._error = null;
-    this._data = null;
-    _updateManagerViewState(ManagerViewState.loading);
+  void resetData({bool updateViewState = true}) {
+    if (updateViewState) {
+      this._error = null;
+      this._data = null;
+      _updateManagerViewState(ManagerViewState.loading);
+    } else {
+      notifyListeners();
+    }
     _updateManagerProcessState(ManagerProcessState.processing);
   }
 
   ///Add [error] our current manager, reset current [data] to null
   @override
-  void addError(dynamic error) {
+  void addError(dynamic error, {bool updateViewState = true}) {
     this._error = error;
-    this._data = null;
-    _updateManagerViewState(ManagerViewState.error);
+    if (updateViewState) {
+      this._data = null;
+      _updateManagerViewState(ManagerViewState.error);
+    } else {
+      notifyListeners();
+    }
     _updateManagerProcessState(ManagerProcessState.error);
   }
 

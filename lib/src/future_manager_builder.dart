@@ -19,7 +19,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   final void Function(dynamic)? onError;
 
   /// A callback function that call when [FutureManager] state is error
-  final void Function(T)? onReady;
+  final void Function(T)? onData;
 
   ///A widget to show on top of this widget when refreshing
   final Widget? onRefreshing;
@@ -36,7 +36,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
     this.error,
     this.onError,
     this.onRefreshing,
-    this.onReady,
+    this.onData,
   }) : super(key: key);
   @override
   _FutureManagerBuilderState createState() => _FutureManagerBuilderState<T>();
@@ -64,7 +64,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
         case ManagerProcessState.ready:
           T? data = widget.futureManager.data;
           if (data != null) {
-            widget.onReady?.call(data);
+            widget.onData?.call(data);
           }
           break;
         case ManagerProcessState.error:

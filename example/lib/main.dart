@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sura_flutter/sura_flutter.dart';
@@ -52,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //Random().nextBool();
       if (error) throw "Error while getting data";
       print("Get data done");
-      return 10;
+      return Random().nextInt(20);
     });
     super.initState();
   }
@@ -63,26 +65,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("FutureManager example"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              //call our asyncOperation again
-              dataManager.refresh(
-                reloading: false,
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.add_a_photo),
-            onPressed: () {
-              dataManager.modifyData((data) {
-                int newData = data ?? 0 + 10;
-                return newData;
-              });
-            },
-          ),
-        ],
       ),
       body: FutureManagerBuilder<int>(
         futureManager: dataManager,
@@ -91,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onError: (err) {
           print("We got an error: $err");
         },
-        onReady: (data) {
+        onData: (data) {
           print("We got a data: $data");
         },
         ready: (context, data) {
@@ -103,12 +85,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("My data: $data"),
                 const SpaceY(24),
                 ElevatedButton(
-                    onPressed: () {
-                      dataManager.modifyData((data) {
-                        return data! + 10;
-                      });
-                    },
-                    child: Text("Update")),
+                  onPressed: () {
+                    dataManager.modifyData((data) {
+                      return data! + 10;
+                    });
+                  },
+                  child: Text("Add 10"),
+                ),
+                ElevatedButton(
+                  onPressed: dataManager.refresh,
+                  child: Text("Refresh"),
+                ),
+                ElevatedButton(
+                  onPressed: () => dataManager.refresh(reloading: false),
+                  child: Text("Refresh without reload"),
+                ),
               ],
             ),
           );
@@ -135,13 +126,20 @@ class SuraManagerWithPagination extends StatefulWidget {
 class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
   FutureManager<UserResponse> userController = FutureManager();
   int currentPage = 1;
+  int maxTimeToShowError = 0;
 
   Future fetchData([bool reload = false]) async {
+    await Future.delayed(const Duration(seconds: 1));
     if (reload) {
       currentPage = 1;
     }
     userController.asyncOperation(
       () async {
+        if (currentPage > 1 && maxTimeToShowError < 2) {
+          maxTimeToShowError++;
+          throw "Expected error thrown from asyncOperation";
+        }
+
         final response = await Dio().get(
           "https://express-boilerplate.chunleethong.com/api/user/all",
           queryParameters: {
@@ -178,6 +176,7 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
           return SuraPaginatedList(
             itemCount: response.users.length,
             hasMoreData: response.hasMoreData,
+            padding: EdgeInsets.zero,
             hasError: userController.hasError,
             itemBuilder: (context, index) {
               final user = response.users[index];
@@ -186,11 +185,23 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
                   child: Icon(Icons.person),
                 ),
                 onTap: () {},
-                title: Text("${user.firstName} ${user.lastName}"),
+                title: Text("${index + 1}: ${user.firstName} ${user.lastName}"),
                 subtitle: Text(user.email!),
               );
             },
             dataLoader: fetchData,
+            errorWidget: Column(
+              children: [
+                Text(userController.error.toString()),
+                IconButton(
+                  onPressed: () {
+                    userController.addError(null, updateViewState: false);
+                    fetchData();
+                  },
+                  icon: Icon(Icons.refresh),
+                ),
+              ],
+            ),
           );
         },
       ),

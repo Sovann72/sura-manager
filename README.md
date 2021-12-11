@@ -2,7 +2,7 @@
 
 A custom ValueNotifier and ValueListenableBuilder that support asynchronus value handling.
 
-[![pub package](https://img.shields.io/badge/pub-0.1.4-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
+[![pub package](https://img.shields.io/badge/pub-0.1.5-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 
 # Installation
 
@@ -10,7 +10,42 @@ Add this to pubspec.yaml
 
 ```dart
 dependencies:
-  sura_manager: ^0.1.4
+  sura_manager: ^0.1.5
+```
+
+### Use case and motivation:
+
+Now imagine that you're fetching data from an API or working with a Future function that reflects the change to UI. Traditionally you could use **setState** or **FutureBuilder** to handle this case. But both of them create a boilerplate code and lack some functionality like refresh, event callback ..etc.
+
+FutureManager provides you a solution with mainly focus on 3 main state of Future value: **Loading**,**Error** and **Done** where you can handle the UI with those states with FutureManagerBuilder.
+
+#### Short example:
+
+```dart
+//Create a manager
+FutureManager<int> dataManager = FutureManager();
+
+//define a Future function
+dataManager.asyncOperation(() => doingSomeAsyncWorkAndReturnValueAsInt());
+
+//Handle the value
+@override
+Widget(BuildContext context){
+  return FutureManagerBuilder<int>(
+      futureManager: dataManager,
+      error: (error) => YourErrorWidget(error), //optional
+      loading: YourLoadingWidget(), //optional
+      ready: (context, data){
+        return ElevatedButton(
+          child: Text("My data: ${data}"),
+          onPressed: (){
+            //Call the future function again
+            dataManager.refresh();
+          },
+        ),
+      }
+  );
+}
 ```
 
 # FutureManager
@@ -97,5 +132,5 @@ class _HomePageState extends State<NewPage> {
 | loading | A widget show when [FutureManager] state is loading | CircularProgressIndicator |
 | error | A widget show when [FutureManager] state is error | Text(error.toString()) |
 | onError | A callback function that call when [FutureManager] state is error | null |
-| onReady | A callback function that call when [FutureManager] state has a data | null |
+| onData | A callback function that call when [FutureManager] state has a data or data is updated | null |
 | onRefreshing | A widget to show on top of this widget when refreshing | null |

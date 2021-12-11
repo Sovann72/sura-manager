@@ -1,3 +1,13 @@
+## [0.1.5] - 11 December 2021
+
+- update Example
+- update README
+- add updateViewState param to resetData and addError to FutureManager. FutureManager now will always be rebuild when refresh is call regardless the reloading is true or false. This change was make FutureManager is work best with Pagination List. See the example for more clear insight.
+
+#### Breaking Change
+
+- FutureManagerBuilder param: onReady now change to onData
+
 ## [0.1.4] - 09 December 2021
 
 - Fix issue #2

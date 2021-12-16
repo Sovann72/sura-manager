@@ -85,6 +85,20 @@ class FutureManager<T> extends IManager<T> {
     );
   }
 
+  ///Similar to [when] but Only listen and display [data]. Default to Display blank when there is [loading] and [error] But can still customize
+  Widget listen({
+    required Widget Function(T) ready,
+    Widget loading = const SizedBox(),
+    Widget Function(dynamic) error = EmptyErrorFunction,
+  }) {
+    return FutureManagerBuilder<T>(
+      futureManager: this,
+      ready: (context, data) => ready(data),
+      loading: loading,
+      error: error,
+    );
+  }
+
   ///refresh is a function that call [asyncOperation] again,
   ///but doesn't reserve configuration
   ///return null if [futureFunction] hasn't been initialize

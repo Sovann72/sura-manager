@@ -1,8 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+
 typedef FutureFunction<T> = Future<T> Function();
 typedef SuccessCallBack<T> = FutureOr<T> Function(T);
 typedef ErrorCallBack = void Function(dynamic);
+
+Widget _emptyErrorFn(_) {
+  return const SizedBox();
+}
+
+const EmptyErrorFunction = _emptyErrorFn;
 
 ///A state that control the state of our manager's UI
 enum ManagerViewState {

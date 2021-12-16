@@ -232,6 +232,11 @@ class FutureManager<T> extends IManager<T> {
   }
 
   @override
+  String toString() {
+    return "Data: $_data, Error: $_error, ViewState: $viewState, ProcessState: $processingState";
+  }
+
+  @override
   void dispose() {
     _data = null;
     _error = null;

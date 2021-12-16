@@ -40,12 +40,12 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  late FutureManager<int> dataManager = FutureManager(
-    reloading: true,
-    onError: (err) {},
-  );
+late FutureManager<int> dataManager = FutureManager(
+  reloading: true,
+  onError: (err) {},
+);
 
+class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     dataManager.asyncOperation(() async {
@@ -162,6 +162,7 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
 
   @override
   void initState() {
+    dataManager.addError(100);
     fetchData();
     super.initState();
   }

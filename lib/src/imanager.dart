@@ -17,7 +17,7 @@ abstract class IManager<T> extends ChangeNotifier {
   void updateData(T data);
 
   ///Reset everything to starting point
-  void resetData();
+  Future<void> resetData();
 
   ///Add error into manager
   void addError(dynamic error);
@@ -30,5 +30,6 @@ abstract class IManager<T> extends ChangeNotifier {
   });
 
   ///dispose everything
+  @override
   void dispose();
 }

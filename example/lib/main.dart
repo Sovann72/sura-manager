@@ -50,9 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     dataManager.asyncOperation(() async {
       await Future.delayed(Duration(milliseconds: 1500));
-      bool error = false;
+      //bool error = false;
       //Random().nextBool();
-      if (error) throw "Error while getting data";
+      //if (error) throw "Error while getting data";
       print("Get data done");
       return Random().nextInt(20);
     });

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:sura_manager/src/imanager.dart';
@@ -57,7 +58,7 @@ class FutureManager<T> extends IManager<T> {
   T? _data;
   dynamic _error;
   ManagerViewState _viewState = ManagerViewState.loading;
-  ValueNotifier<ManagerProcessState> _processingState =
+  final ValueNotifier<ManagerProcessState> _processingState =
       ValueNotifier(ManagerProcessState.idle);
 
   ManagerViewState get viewState => _viewState;
@@ -102,17 +103,20 @@ class FutureManager<T> extends IManager<T> {
   ///refresh is a function that call [asyncOperation] again,
   ///but doesn't reserve configuration
   ///return null if [futureFunction] hasn't been initialize
-  Future<T?> Function({
+  late Future<T?> Function({
     bool? reloading,
     SuccessCallBack<T>? onSuccess,
     VoidCallback? onDone,
     ErrorCallBack? onError,
     bool? throwError,
-  }) refresh = ({reloading, onSuccess, onDone, onError, throwError}) async {
-    print("refresh is depend on asyncOperation,"
-        " You need to call asyncOperation once before you can call refresh");
+  }) refresh = _emptyRefreshFunction;
+
+  Future<T?> _emptyRefreshFunction(
+      {reloading, onSuccess, onDone, onError, throwError}) async {
+    log("refresh() is depend on asyncOperation(),"
+        " You need to call asyncOperation() once before you can call refresh()");
     return null;
-  };
+  }
 
   @override
   Future<T?> asyncOperation(
@@ -135,20 +139,20 @@ class FutureManager<T> extends IManager<T> {
         triggerError = shouldReload;
       }
       try {
-        this.resetData(updateViewState: shouldReload);
+        await resetData(updateViewState: shouldReload);
         future = futureFunction.call();
         T result = await future!;
         if (successCallBack != null) {
           result = await successCallBack.call(result);
         }
-        this.updateData(result);
+        updateData(result);
         return result;
       } catch (exception) {
         ///Only update viewState if [triggerError] is true
-        this.addError(exception, updateViewState: triggerError);
+        addError(exception, updateViewState: triggerError);
         errorCallBack?.call(exception);
         if (shouldThrowError) {
-          throw exception;
+          rethrow;
         }
         return null;
       } finally {
@@ -166,7 +170,7 @@ class FutureManager<T> extends IManager<T> {
 
   void _updateManagerViewState(ManagerViewState state) {
     if (_disposed) return;
-    this._viewState = state;
+    _viewState = state;
     notifyListeners();
   }
 
@@ -174,10 +178,10 @@ class FutureManager<T> extends IManager<T> {
     if (_disposed) return;
 
     ///notify the ValueNotifier because it doesn't update if data is the same
-    if (this._processingState.value == state) {
-      this._processingState.notifyListeners();
+    if (_processingState.value == state) {
+      _processingState.notifyListeners();
     }
-    this._processingState.value = state;
+    _processingState.value = state;
   }
 
   ///Similar to [updateData] but provide current [data] in Manager as a param
@@ -203,13 +207,13 @@ class FutureManager<T> extends IManager<T> {
 
   ///Reset all [data] and [error] to [loading] state
   @override
-  void resetData({bool updateViewState = true}) {
+  Future<void> resetData({bool updateViewState = true}) async {
     if (updateViewState) {
-      this._error = null;
-      this._data = null;
+      _error = null;
+      _data = null;
       _updateManagerViewState(ManagerViewState.loading);
     } else {
-      notifyListeners();
+      await Future.microtask(() => notifyListeners());
     }
     _updateManagerProcessState(ManagerProcessState.processing);
   }
@@ -217,9 +221,9 @@ class FutureManager<T> extends IManager<T> {
   ///Add [error] our current manager, reset current [data] to null
   @override
   void addError(dynamic error, {bool updateViewState = true}) {
-    this._error = error;
+    _error = error;
     if (updateViewState) {
-      this._data = null;
+      _data = null;
       _updateManagerViewState(ManagerViewState.error);
     } else {
       notifyListeners();

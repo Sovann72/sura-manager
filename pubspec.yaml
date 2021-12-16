@@ -14,6 +14,7 @@ dependencies:
   sura_flutter: ^0.5.1
 
 dev_dependencies:
+  flutter_lints:
   flutter_test:
     sdk: flutter
 flutter:

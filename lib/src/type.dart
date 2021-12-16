@@ -10,6 +10,7 @@ Widget _emptyErrorFn(_) {
   return const SizedBox();
 }
 
+// ignore: constant_identifier_names
 const EmptyErrorFunction = _emptyErrorFn;
 
 ///A state that control the state of our manager's UI

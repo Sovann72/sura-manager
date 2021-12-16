@@ -9,7 +9,7 @@ void main() {
   test("Test future manger with value", () async {
     late int value;
     await futureManager.asyncOperation(() async {
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
       return 10;
     }, onSuccess: (data) {
       value = data;
@@ -21,8 +21,8 @@ void main() {
   test("Test future manger with error", () async {
     int? value;
     await futureManager.asyncOperation(() async {
-      await Future.delayed(Duration(seconds: 2));
-      throw HttpException("Unable to process");
+      await Future.delayed(const Duration(seconds: 2));
+      throw const HttpException("Unable to process");
     }, onSuccess: (data) {
       value = data;
       return value!;

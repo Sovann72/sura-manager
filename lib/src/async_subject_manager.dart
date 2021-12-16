@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -55,17 +56,20 @@ class AsyncSubjectManager<T> extends IManager<T> {
 
   T? get value => _controller.value;
 
-  Future<T?> Function({
+  late Future<T?> Function({
     bool? reloading,
     SuccessCallBack<T>? onSuccess,
     VoidCallback? onDone,
     ErrorCallBack? onError,
     bool? throwError,
-  }) refresh = ({reloading, onSuccess, onDone, onError, throwError}) async {
-    print("refresh is depend on asyncOperation."
-        "You need to call asyncOperation once before you can call refresh");
+  }) refresh = _emptyRefreshFunction;
+
+  Future<T?> _emptyRefreshFunction(
+      {reloading, onSuccess, onDone, onError, throwError}) async {
+    log("refresh() is depend on asyncOperation(),"
+        " You need to call asyncOperation() once before you can call refresh()");
     return null;
-  };
+  }
 
   @override
   Widget when({
@@ -98,24 +102,24 @@ class AsyncSubjectManager<T> extends IManager<T> {
       bool shouldThrowError = throwError ?? false;
       //
       bool triggerError = true;
-      if (this.hasData) {
+      if (hasData) {
         triggerError = shouldReload;
       }
       try {
         if (shouldReload) {
-          this.resetData();
+          resetData();
         }
         T data = await futureFunction.call();
         if (successCallBack != null) {
           data = await successCallBack.call(data);
         }
-        this.updateData(data);
+        updateData(data);
         return data;
       } catch (exception) {
         errorCallBack?.call(exception);
-        if (triggerError) this.addError(exception);
+        if (triggerError) addError(exception);
         if (shouldThrowError) {
-          throw exception;
+          rethrow;
         }
         return null;
       } finally {
@@ -139,7 +143,7 @@ class AsyncSubjectManager<T> extends IManager<T> {
   }
 
   @override
-  void resetData() {
+  Future<void> resetData() async {
     if (!_controller.isClosed) {
       _controller.add(null);
     }

@@ -1,8 +1,8 @@
-## [0.2.0] - 16 December 2021
+## [0.2.0] - 17 December 2021
 
 - Code improvement
 - add [listen] function to FutureManager
-- Fix a bug where listener of FutureManager is deactivate when rebuilt
+- Add [useMicrotask] param to several method in FutureManager to prevent a bug where listener of FutureManager is deactivate when rebuilt
 
 ## [0.1.5] - 11 December 2021
 

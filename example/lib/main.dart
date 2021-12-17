@@ -53,8 +53,12 @@ class _MyHomePageState extends State<MyHomePage> {
       //bool error = false;
       //Random().nextBool();
       //if (error) throw "Error while getting data";
-      print("Get data done");
+      //print("Get data done");
       return Random().nextInt(20);
+    });
+
+    dataManager.addListener(() {
+      print(dataManager.toString());
     });
     super.initState();
   }
@@ -71,10 +75,10 @@ class _MyHomePageState extends State<MyHomePage> {
         onRefreshing: const RefreshProgressIndicator(),
         loading: Center(child: CircularProgressIndicator()),
         onError: (err) {
-          print("We got an error: $err");
+          //print("We got an error: $err");
         },
         onData: (data) {
-          print("We got a data: $data");
+          //print("We got a data: $data");
         },
         ready: (context, data) {
           print("Rebuild");
@@ -85,20 +89,27 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("My data: $data"),
                 const SpaceY(24),
                 ElevatedButton(
-                  onPressed: () {
-                    dataManager.modifyData((data) {
+                  onPressed: () async {
+                    await dataManager.modifyData((data) {
                       return data! + 10;
                     });
                   },
                   child: Text("Add 10"),
                 ),
+                const SpaceY(24),
                 ElevatedButton(
                   onPressed: dataManager.refresh,
                   child: Text("Refresh"),
                 ),
+                const SpaceY(24),
                 ElevatedButton(
                   onPressed: () => dataManager.refresh(reloading: false),
                   child: Text("Refresh without reload"),
+                ),
+                const SpaceY(24),
+                ElevatedButton(
+                  onPressed: dataManager.resetData,
+                  child: Text("Reset"),
                 ),
               ],
             ),
@@ -141,7 +152,7 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
         }
 
         final response = await Dio().get(
-          "https://express-boilerplate.chunleethong.com/api/user/all",
+          "https://express-boilerplate-dev.lynical.com/api/user/all",
           queryParameters: {
             "page": currentPage,
             "count": 10,
@@ -162,7 +173,7 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
 
   @override
   void initState() {
-    dataManager.addError(100);
+    dataManager.addError(100, useMicrotask: true);
     fetchData();
     super.initState();
   }
@@ -246,11 +257,11 @@ class UserModel {
   String? avatar;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        id: json["_id"] ?? null,
-        email: json["email"] ?? null,
-        firstName: json["first_name"] ?? null,
-        lastName: json["last_name"] ?? null,
-        avatar: json["profile_img"] ?? null,
+        id: json["_id"],
+        email: json["email"],
+        firstName: json["first_name"],
+        lastName: json["last_name"],
+        avatar: json["profile_img"],
       );
 }
 

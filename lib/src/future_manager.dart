@@ -7,7 +7,6 @@ import 'package:sura_manager/src/imanager.dart';
 import 'future_manager_builder.dart';
 import 'type.dart';
 
-///This class is inspired from SWR in React
 ///[FutureManager] is a wrap around [Future] and [ChangeNotifier]
 ///
 ///[FutureManager] use [FutureManagerBuilder] instead of FutureBuilder to handle data
@@ -168,67 +167,107 @@ class FutureManager<T> extends IManager<T> {
     );
   }
 
-  void _updateManagerViewState(ManagerViewState state) {
-    if (_disposed) return;
-    _viewState = state;
-    notifyListeners();
-  }
-
-  void _updateManagerProcessState(ManagerProcessState state) {
-    if (_disposed) return;
-
-    ///notify the ValueNotifier because it doesn't update if data is the same
-    if (_processingState.value == state) {
-      _processingState.notifyListeners();
-    }
-    _processingState.value = state;
-  }
-
-  ///Similar to [updateData] but provide current [data] in Manager as a param
-  ///Even this function is mark as async, this function shouldn't be use as async
-  ///If you want to update data with async, use [asyncOperation] instead
-  void modifyData(FutureOr<T> Function(T?) onChange) async {
-    T? data = await onChange(_data);
-    updateData(data);
-  }
-
-  ///Update current data in our Manager
-  ///Ignore if data is null
-  ///Use [resetData] instead if you want to reset to [loading] state
-  @override
-  void updateData(T? data) {
-    if (data != null) {
-      _data = data;
-      _error = null;
-      _updateManagerProcessState(ManagerProcessState.ready);
-      _updateManagerViewState(ManagerViewState.ready);
-    }
-  }
-
-  ///Reset all [data] and [error] to [loading] state
-  @override
-  Future<void> resetData({bool updateViewState = true}) async {
-    if (updateViewState) {
-      _error = null;
-      _data = null;
-      _updateManagerViewState(ManagerViewState.loading);
-    } else {
-      await Future.microtask(() => notifyListeners());
-    }
-    _updateManagerProcessState(ManagerProcessState.processing);
-  }
-
-  ///Add [error] our current manager, reset current [data] to null
-  @override
-  void addError(dynamic error, {bool updateViewState = true}) {
-    _error = error;
-    if (updateViewState) {
-      _data = null;
-      _updateManagerViewState(ManagerViewState.error);
+  ///Custom [notifyListeners] to support Future that can be useful in some casse
+  void _notifyListeners({required bool useMicrotask}) {
+    if (useMicrotask) {
+      Future.microtask(() => notifyListeners());
     } else {
       notifyListeners();
     }
-    _updateManagerProcessState(ManagerProcessState.error);
+  }
+
+  ///[useMicrotask] param can be use to prevent schedule rebuilt while navigating or rebuilt
+  void _updateManagerViewState(ManagerViewState state,
+      {bool useMicrotask = false}) {
+    if (_disposed) return;
+    _viewState = state;
+    _notifyListeners(useMicrotask: useMicrotask);
+  }
+
+  ///Wrap with [microtask] to prevent schedule rebuilt while navigating or rebuilt
+  void _updateManagerProcessState(ManagerProcessState state,
+      {bool useMicrotask = false}) {
+    if (_disposed) return;
+
+    void update() {
+      if (_processingState.value == state) {
+        _processingState.notifyListeners();
+      }
+      _processingState.value = state;
+    }
+
+    ///notify the ValueNotifier because it doesn't update if data is the same
+    if (useMicrotask) {
+      Future.microtask(update);
+    } else {
+      update();
+    }
+  }
+
+  ///Similar to [updateData] but provide current current [data] in Manager as param.
+  ///return updated [data] result once completed.
+  Future<T?> modifyData(FutureOr<T> Function(T?) onChange) async {
+    T? data = await onChange(_data);
+    updateData(data);
+    return data;
+  }
+
+  ///Update current data in our Manager.
+  ///Ignore if data is null.
+  ///Use [resetData] instead if you want to reset to [loading] state
+  @override
+  T? updateData(T? data, {bool useMicrotask = false}) {
+    if (data != null) {
+      _data = data;
+      _error = null;
+      _updateManagerProcessState(ManagerProcessState.ready,
+          useMicrotask: useMicrotask);
+      _updateManagerViewState(ManagerViewState.ready,
+          useMicrotask: useMicrotask);
+      return data;
+    }
+  }
+
+  ///Add [error] our current manager, reset current [data] if [updateViewState] to null
+  ///
+  @override
+  void addError(dynamic error,
+      {bool updateViewState = true, bool useMicrotask = false}) {
+    _error = error;
+    if (updateViewState) {
+      _data = null;
+      _updateManagerViewState(
+        ManagerViewState.error,
+        useMicrotask: useMicrotask,
+      );
+    } else {
+      _notifyListeners(useMicrotask: useMicrotask);
+    }
+    _updateManagerProcessState(
+      ManagerProcessState.error,
+      useMicrotask: useMicrotask,
+    );
+  }
+
+  ///Reset all [data] and [error] to [loading] state.
+  ///Only [notifyListeners] if [updateViewState] is false.
+  @override
+  Future<void> resetData({bool updateViewState = true}) async {
+    const bool useMicroTask = true;
+    if (updateViewState) {
+      _error = null;
+      _data = null;
+      _updateManagerViewState(
+        ManagerViewState.loading,
+        useMicrotask: useMicroTask,
+      );
+    } else {
+      _notifyListeners(useMicrotask: useMicroTask);
+    }
+    _updateManagerProcessState(
+      ManagerProcessState.processing,
+      useMicrotask: useMicroTask,
+    );
   }
 
   @override

@@ -14,7 +14,7 @@ abstract class IManager<T> extends ChangeNotifier {
   });
 
   ///Update current data in manager
-  void updateData(T data);
+  T? updateData(T data);
 
   ///Reset everything to starting point
   Future<void> resetData();

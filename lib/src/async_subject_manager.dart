@@ -12,7 +12,6 @@ import 'imanager.dart';
 /// Previously call [BaseStream] or [BaseExtendBloc]
 /// [AsyncSubjectManager] is a wrap around bloc pattern that use [rxdart]
 /// [AsyncSubjectManager] provide a method [asyncOperation] to handle or call async function associated with rxdart's [BehaviorSubject]
-///
 class AsyncSubjectManager<T> extends IManager<T> {
   late final BehaviorSubject<T?> _controller;
 
@@ -136,9 +135,10 @@ class AsyncSubjectManager<T> extends IManager<T> {
   }
 
   @override
-  void updateData(T data) {
+  T? updateData(T data) {
     if (!_controller.isClosed) {
       _controller.add(data);
+      return data;
     }
   }
 

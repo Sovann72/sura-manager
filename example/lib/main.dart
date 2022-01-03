@@ -68,17 +68,17 @@ class _MyHomePageState extends State<MyHomePage> {
     //Use with FutureManagerBuilder
     return Scaffold(
       appBar: AppBar(
-        title: Text("FutureManager example"),
+        title: const Text("FutureManager example"),
       ),
       body: FutureManagerBuilder<int>(
         futureManager: dataManager,
-        onRefreshing: const RefreshProgressIndicator(),
-        loading: Center(child: CircularProgressIndicator()),
+        onRefreshing: () => const RefreshProgressIndicator(),
+        loading: const Center(child: CircularProgressIndicator()),
         onError: (err) {
           //print("We got an error: $err");
         },
         onData: (data) {
-          //print("We got a data: $data");
+          print("We got a data: $data");
         },
         ready: (context, data) {
           print("Rebuild");
@@ -130,8 +130,7 @@ class SuraManagerWithPagination extends StatefulWidget {
   const SuraManagerWithPagination({Key? key}) : super(key: key);
 
   @override
-  _SuraManagerWithPaginationState createState() =>
-      _SuraManagerWithPaginationState();
+  _SuraManagerWithPaginationState createState() => _SuraManagerWithPaginationState();
 }
 
 class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
@@ -227,17 +226,11 @@ class UserResponse {
 
   UserResponse({this.pagination, required this.users});
 
-  bool get hasMoreData =>
-      pagination != null ? users.length < pagination!.totalItems : false;
+  bool get hasMoreData => pagination != null ? users.length < pagination!.totalItems : false;
 
   factory UserResponse.fromJson(Map<String, dynamic> json) => UserResponse(
-        users: json["data"] == null
-            ? []
-            : List<UserModel>.from(
-                json["data"].map((x) => UserModel.fromJson(x))),
-        pagination: json["pagination"] == null
-            ? null
-            : Pagination.fromJson(json["pagination"]),
+        users: json["data"] == null ? [] : List<UserModel>.from(json["data"].map((x) => UserModel.fromJson(x))),
+        pagination: json["pagination"] == null ? null : Pagination.fromJson(json["pagination"]),
       );
 }
 

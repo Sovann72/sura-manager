@@ -22,7 +22,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   final void Function(T)? onData;
 
   ///A widget to show on top of this widget when refreshing
-  final Widget? onRefreshing;
+  final Widget? Function() onRefreshing;
 
   ///A widget to show when [FutureManager] has a data
   final Widget Function(BuildContext, T) ready;
@@ -96,20 +96,26 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
   @override
   Widget build(BuildContext context) {
     suraProvider = SuraProvider.of(context);
+
+    final Widget managerWidget = _buildWidgetByState();
+
+    if(widget.onRefreshing==null){
+      return managerWidget;
+    }
+
     //
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        _buildWidgetByState(),
-        if (widget.onRefreshing != null &&
-            widget.futureManager.isRefreshing) ...[
+        managerWidget,
+        if (widget.futureManager.isRefreshing) ...[
           ValueListenableBuilder<ManagerProcessState>(
             valueListenable: widget.futureManager.processingState,
             builder: (context, value, child) {
               if (value == ManagerProcessState.processing) return child!;
               return const SizedBox();
             },
-            child: widget.onRefreshing,
+            child: widget.onRefreshing!.call(),
           ),
         ],
       ],

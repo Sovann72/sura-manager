@@ -66,7 +66,7 @@ class FutureManager<T> extends IManager<T> {
   dynamic get error => _error;
 
   ///
-  bool get isRefreshing => _data != null || _error != null;
+  bool get isRefreshing => hasData || hasError;
   bool get hasData => _data != null;
   bool get hasError => _error != null;
   bool _disposed = false;

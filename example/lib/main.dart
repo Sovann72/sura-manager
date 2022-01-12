@@ -6,10 +6,12 @@ import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return SuraProvider(
@@ -19,7 +21,8 @@ class MyApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(error.toString()),
-              TextButton(onPressed: onRefresh, child: Icon(Icons.refresh)),
+              TextButton(
+                  onPressed: onRefresh, child: const Icon(Icons.refresh)),
             ],
           ),
         );
@@ -29,13 +32,15 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: MyHomePage(),
+        home: const MyHomePage(),
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -49,16 +54,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     dataManager.asyncOperation(() async {
-      await Future.delayed(Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1500));
       //bool error = false;
       //Random().nextBool();
       //if (error) throw "Error while getting data";
-      //print("Get data done");
+      //debugPrint("Get data done");
       return Random().nextInt(20);
     });
 
     dataManager.addListener(() {
-      print(dataManager.toString());
+      debugPrint(dataManager.toString());
     });
     super.initState();
   }
@@ -75,13 +80,13 @@ class _MyHomePageState extends State<MyHomePage> {
         onRefreshing: () => const RefreshProgressIndicator(),
         loading: const Center(child: CircularProgressIndicator()),
         onError: (err) {
-          //print("We got an error: $err");
+          //debugdebugPrint("We got an error: $err");
         },
         onData: (data) {
-          print("We got a data: $data");
+          debugPrint("We got a data: $data");
         },
         ready: (context, data) {
-          print("Rebuild");
+          debugPrint("Rebuild");
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -94,22 +99,22 @@ class _MyHomePageState extends State<MyHomePage> {
                       return data! + 10;
                     });
                   },
-                  child: Text("Add 10"),
+                  child: const Text("Add 10"),
                 ),
                 const SpaceY(24),
                 ElevatedButton(
                   onPressed: dataManager.refresh,
-                  child: Text("Refresh"),
+                  child: const Text("Refresh"),
                 ),
                 const SpaceY(24),
                 ElevatedButton(
                   onPressed: () => dataManager.refresh(reloading: false),
-                  child: Text("Refresh without reload"),
+                  child: const Text("Refresh without reload"),
                 ),
                 const SpaceY(24),
                 ElevatedButton(
                   onPressed: dataManager.resetData,
-                  child: Text("Reset"),
+                  child: const Text("Reset"),
                 ),
               ],
             ),
@@ -118,9 +123,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          SuraPageNavigator.push(context, SuraManagerWithPagination());
+          SuraPageNavigator.push(context, const SuraManagerWithPagination());
         },
-        child: Icon(Icons.assessment),
+        child: const Icon(Icons.assessment),
       ),
     );
   }
@@ -130,7 +135,8 @@ class SuraManagerWithPagination extends StatefulWidget {
   const SuraManagerWithPagination({Key? key}) : super(key: key);
 
   @override
-  _SuraManagerWithPaginationState createState() => _SuraManagerWithPaginationState();
+  _SuraManagerWithPaginationState createState() =>
+      _SuraManagerWithPaginationState();
 }
 
 class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
@@ -209,7 +215,7 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
                     userController.addError(null, updateViewState: false);
                     fetchData();
                   },
-                  icon: Icon(Icons.refresh),
+                  icon: const Icon(Icons.refresh),
                 ),
               ],
             ),
@@ -226,11 +232,17 @@ class UserResponse {
 
   UserResponse({this.pagination, required this.users});
 
-  bool get hasMoreData => pagination != null ? users.length < pagination!.totalItems : false;
+  bool get hasMoreData =>
+      pagination != null ? users.length < pagination!.totalItems : false;
 
   factory UserResponse.fromJson(Map<String, dynamic> json) => UserResponse(
-        users: json["data"] == null ? [] : List<UserModel>.from(json["data"].map((x) => UserModel.fromJson(x))),
-        pagination: json["pagination"] == null ? null : Pagination.fromJson(json["pagination"]),
+        users: json["data"] == null
+            ? []
+            : List<UserModel>.from(
+                json["data"].map((x) => UserModel.fromJson(x))),
+        pagination: json["pagination"] == null
+            ? null
+            : Pagination.fromJson(json["pagination"]),
       );
 }
 

@@ -1,6 +1,7 @@
-## [0.2.1] - 3 January 2022
+## [0.2.1] - 13 January 2022
 
 - Code refractor
+
 ## [0.2.0] - 17 December 2021
 
 - Code improvement

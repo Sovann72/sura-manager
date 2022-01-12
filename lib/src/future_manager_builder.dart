@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
-
-import 'future_manager.dart';
 
 /// A widget that build base on the state a [FutureManager]
 class FutureManagerBuilder<T> extends StatefulWidget {
@@ -127,13 +124,17 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
         if (widget.loading != null) {
           return widget.loading!;
         }
-        return suraProvider?.loadingWidget ?? const Center(child: CircularProgressIndicator());
+        return suraProvider?.loadingWidget ??
+            const Center(child: CircularProgressIndicator());
 
       case ManagerViewState.error:
         if (widget.error != null) {
           return widget.error!(widget.futureManager.error);
         }
-        return suraProvider?.errorWidget?.call(widget.futureManager.error, widget.futureManager.refresh) ??
+        return suraProvider?.errorWidget?.call(
+              widget.futureManager.error,
+              widget.futureManager.refresh,
+            ) ??
             Center(
               child: Text(
                 widget.futureManager.error.toString(),

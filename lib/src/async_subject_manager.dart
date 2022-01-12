@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sura_flutter/sura_flutter.dart';
 
-import 'type.dart';
 import 'imanager.dart';
+import 'type.dart';
 
 /// Previously call [BaseStream] or [BaseExtendBloc]
 /// [AsyncSubjectManager] is a wrap around bloc pattern that use [rxdart]

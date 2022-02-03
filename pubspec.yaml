@@ -1,6 +1,6 @@
 name: sura_manager
 description: ValueNotifier and ValueListenableBuilder but for asynchronous value.
-version: 0.2.1
+version: 1.0.0
 homepage: https://github.com/asurraa/sura_manager
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   rxdart: ^0.27.0
-  sura_flutter: ^0.5.1
+  sura_flutter: ^1.0.0
 
 dev_dependencies:
   flutter_lints:

@@ -1,3 +1,7 @@
+## [1.0.0] - 3 February 2022
+
+- Stable release
+
 ## [0.2.1] - 13 January 2022
 
 - Code refractor

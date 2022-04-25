@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 typedef FutureFunction<T> = Future<T> Function();
 typedef SuccessCallBack<T> = FutureOr<T> Function(T);
-typedef ErrorCallBack = void Function(dynamic);
+typedef ErrorCallBack = void Function(FutureManagerError);
 
 Widget _emptyErrorFn(_) {
   return const SizedBox();
@@ -26,4 +26,14 @@ enum ManagerProcessState {
   processing,
   ready,
   error,
+}
+
+
+
+class FutureManagerError {
+  final dynamic exception;
+  final StackTrace? stackTrace;
+
+  FutureManagerError({required this.exception, this.stackTrace});
+  
 }

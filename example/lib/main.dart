@@ -113,6 +113,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SpaceY(24),
                 ElevatedButton(
+                  onPressed: () async {
+                    dataManager.addError(
+                        const FutureManagerError(exception: "exception"));
+                    print(dataManager.error.runtimeType.toString());
+                  },
+                  child: const Text("Add error"),
+                ),
+                const SpaceY(24),
+                ElevatedButton(
                   onPressed: dataManager.resetData,
                   child: const Text("Reset"),
                 ),
@@ -178,7 +187,9 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
 
   @override
   void initState() {
-    dataManager.addError(100, useMicrotask: true);
+    ///Test microtask set to true
+    dataManager.addError(const FutureManagerError(exception: "100"),
+        useMicrotask: true);
     fetchData();
     super.initState();
   }
@@ -212,7 +223,7 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
                 Text(userController.error.toString()),
                 IconButton(
                   onPressed: () {
-                    userController.addError(null, updateViewState: false);
+                    userController.addError("null", updateViewState: false);
                     fetchData();
                   },
                   icon: const Icon(Icons.refresh),

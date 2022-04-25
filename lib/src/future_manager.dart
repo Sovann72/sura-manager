@@ -55,7 +55,7 @@ class FutureManager<T> extends IManager<T> {
 
   ///
   T? _data;
-  dynamic _error;
+  FutureManagerError? _error;
   ManagerViewState _viewState = ManagerViewState.loading;
   final ValueNotifier<ManagerProcessState> _processingState =
       ValueNotifier(ManagerProcessState.idle);
@@ -63,7 +63,7 @@ class FutureManager<T> extends IManager<T> {
   ManagerViewState get viewState => _viewState;
   ValueNotifier<ManagerProcessState> get processingState => _processingState;
   T? get data => _data;
-  dynamic get error => _error;
+  FutureManagerError? get error => _error;
 
   ///
   bool get isRefreshing => hasData || hasError;
@@ -146,10 +146,15 @@ class FutureManager<T> extends IManager<T> {
         }
         updateData(result);
         return result;
-      } catch (exception) {
+      } catch (exception, stackTrace) {
+        FutureManagerError error = FutureManagerError(
+          exception: exception,
+          stackTrace: stackTrace,
+        );
+
         ///Only update viewState if [triggerError] is true
-        addError(exception, updateViewState: triggerError);
-        errorCallBack?.call(exception);
+        addError(error, updateViewState: triggerError);
+        errorCallBack?.call(error);
         if (shouldThrowError) {
           rethrow;
         }
@@ -226,14 +231,21 @@ class FutureManager<T> extends IManager<T> {
           useMicrotask: useMicrotask);
       return data;
     }
+    return null;
   }
 
   ///Add [error] our current manager, reset current [data] if [updateViewState] to null
   ///
   @override
-  void addError(dynamic error,
-      {bool updateViewState = true, bool useMicrotask = false}) {
-    _error = error;
+  void addError(
+    Object error, {
+    bool updateViewState = true,
+    bool useMicrotask = false,
+  }) {
+    var err = error is! FutureManagerError
+        ? FutureManagerError(exception: error)
+        : error;
+    _error = err;
     if (updateViewState) {
       _data = null;
       _updateManagerViewState(

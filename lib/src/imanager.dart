@@ -19,7 +19,7 @@ abstract class IManager<T> extends ChangeNotifier {
   Future<void> resetData();
 
   ///Add error into manager
-  void addError(dynamic error);
+  void addError(Object error);
 
   ///handle widget to show with manager state
   Widget when({

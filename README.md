@@ -2,7 +2,7 @@
 
 ValueNotifier and ValueListenableBuilder but for asynchronous value.
 
-[![pub package](https://img.shields.io/badge/pub-1.0.0-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
+[![pub package](https://img.shields.io/badge/pub-1.1.0-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 
 # Installation
 
@@ -10,7 +10,7 @@ Add this to pubspec.yaml
 
 ```dart
 dependencies:
-  sura_manager: ^1.0.0
+  sura_manager: ^1.1.0
 ```
 
 ### Use case and motivation:

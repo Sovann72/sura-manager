@@ -28,12 +28,14 @@ enum ManagerProcessState {
   error,
 }
 
-
-
 class FutureManagerError {
-  final dynamic exception;
+  final Object exception;
   final StackTrace? stackTrace;
 
-  FutureManagerError({required this.exception, this.stackTrace});
-  
+  const FutureManagerError({required this.exception, this.stackTrace});
+
+  @override
+  String toString() {
+    return exception.toString();
+  }
 }

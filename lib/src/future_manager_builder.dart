@@ -10,10 +10,10 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   final Widget? loading;
 
   /// A widget to show when [FutureManager] state is error
-  final Widget Function(dynamic)? error;
+  final Widget Function(FutureManagerError)? error;
 
   /// A callback function that call when [FutureManager] state is error
-  final void Function(dynamic)? onError;
+  final void Function(FutureManagerError)? onError;
 
   /// A callback function that call when [FutureManager] state is error
   final void Function(T)? onData;
@@ -67,7 +67,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
         case ManagerProcessState.error:
           final error = widget.futureManager.error;
           if (widget.onError != null) {
-            widget.onError?.call(error);
+            widget.onError?.call(error!);
           } else {
             suraProvider?.onFutureManagerError?.call(error, context);
           }
@@ -128,16 +128,17 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
             const Center(child: CircularProgressIndicator());
 
       case ManagerViewState.error:
+        final error = widget.futureManager.error!;
         if (widget.error != null) {
-          return widget.error!(widget.futureManager.error);
+          return widget.error!.call(error);
         }
         return suraProvider?.errorWidget?.call(
-              widget.futureManager.error,
+              error,
               widget.futureManager.refresh,
             ) ??
             Center(
               child: Text(
-                widget.futureManager.error.toString(),
+                error.toString(),
                 textAlign: TextAlign.center,
               ),
             );

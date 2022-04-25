@@ -113,9 +113,13 @@ class AsyncSubjectManager<T> extends IManager<T> {
         }
         updateData(data);
         return data;
-      } catch (exception) {
-        errorCallBack?.call(exception);
-        if (triggerError) addError(exception);
+      } catch (exception, stackTrace) {
+        FutureManagerError error = FutureManagerError(
+          exception: exception,
+          stackTrace: stackTrace,
+        );
+        errorCallBack?.call(error);
+        if (triggerError) addError(error);
         if (shouldThrowError) {
           rethrow;
         }
@@ -139,6 +143,7 @@ class AsyncSubjectManager<T> extends IManager<T> {
       _controller.add(data);
       return data;
     }
+    return null;
   }
 
   @override

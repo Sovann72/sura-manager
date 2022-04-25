@@ -1,3 +1,7 @@
+## [1.1.0] - 25 April 2022
+
+- error from Manager now has a type of FutureManagerError instead of dynamic
+
 ## [1.0.0] - 3 February 2022
 
 - Stable release

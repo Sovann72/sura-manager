@@ -1,3 +1,10 @@
+## [1.2.0] - 26 April 2022
+
+**Small breaking changes**
+
+- add SuraManagerProvider
+- loadingWidget and ErrorWidget in SuraManager now using from SuraManagerProvider instead of SuraProvider
+
 ## [1.1.0] - 25 April 2022
 
 - error from Manager now has a type of FutureManagerError instead of dynamic

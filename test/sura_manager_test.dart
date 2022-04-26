@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sura_manager/src/future_manager.dart';
+import 'package:sura_manager/sura_manager.dart';
 
 void main() {
   FutureManager<int> futureManager = FutureManager();
@@ -28,7 +28,8 @@ void main() {
       return value!;
     });
     expect(value, null);
-    expect(futureManager.error.runtimeType, HttpException);
+    expect(futureManager.error!.runtimeType, FutureManagerError);
+    expect(futureManager.error!.exception.runtimeType, HttpException);
   });
 
   // test("Test future manger with loading", () async {

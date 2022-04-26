@@ -41,7 +41,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
 
 class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
   //
-  SuraProvider? suraProvider;
+  SuraManagerProvider? managerProvider;
 
   //
   void managerListener() {
@@ -69,7 +69,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
           if (widget.onError != null) {
             widget.onError?.call(error!);
           } else {
-            suraProvider?.onFutureManagerError?.call(error, context);
+            managerProvider?.onFutureManagerError?.call(error!, context);
           }
           break;
       }
@@ -92,7 +92,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
-    suraProvider = SuraProvider.of(context);
+    managerProvider = SuraManagerProvider.of(context);
     final Widget managerWidget = _buildWidgetByState();
 
     if (widget.onRefreshing == null) {
@@ -124,7 +124,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
         if (widget.loading != null) {
           return widget.loading!;
         }
-        return suraProvider?.loadingWidget ??
+        return managerProvider?.managerLoadingBuilder ??
             const Center(child: CircularProgressIndicator());
 
       case ManagerViewState.error:
@@ -132,7 +132,7 @@ class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
         if (widget.error != null) {
           return widget.error!.call(error);
         }
-        return suraProvider?.errorWidget?.call(
+        return managerProvider?.errorBuilder?.call(
               error,
               widget.futureManager.refresh,
             ) ??

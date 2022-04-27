@@ -1,3 +1,7 @@
+## [1.2.1] - 27 April 2022
+
+- add clearError
+
 ## [1.2.0] - 26 April 2022
 
 **Small breaking changes**

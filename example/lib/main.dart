@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(error.toString()),
-              TextButton(onPressed: onRefresh, child: const Icon(Icons.refresh)),
+              TextButton(
+                  onPressed: onRefresh, child: const Icon(Icons.refresh)),
             ],
           ),
         );
@@ -70,6 +71,22 @@ class _MyHomePageState extends State<MyHomePage> {
         futureManager: widget.dataManager,
         onRefreshing: () => const RefreshProgressIndicator(),
         loading: const Center(child: CircularProgressIndicator()),
+        error: (err) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(err.toString()),
+                ElevatedButton(
+                  onPressed: () {
+                    widget.dataManager.clearError();
+                  },
+                  child: const Text("Clear error"),
+                ),
+              ],
+            ),
+          );
+        },
         onError: (err) {
           //debugdebugPrint("We got an error: $err");
         },
@@ -111,7 +128,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ElevatedButton(
                   key: const ValueKey("add-error"),
                   onPressed: () async {
-                    widget.dataManager.addError(const FutureManagerError(exception: "exception"));
+                    widget.dataManager.addError(
+                        const FutureManagerError(exception: "exception"));
                   },
                   child: const Text("Add error"),
                 ),

@@ -4,7 +4,8 @@ import 'package:sura_manager/sura_manager.dart';
 import 'package:sura_manager_example/main.dart';
 
 void main() {
-  testWidgets('FutureManagerBuilder test all state', (WidgetTester tester) async {
+  testWidgets('FutureManagerBuilder test all state',
+      (WidgetTester tester) async {
     const twosecond = Duration(seconds: 2);
 
     final FutureManager<int> manager = FutureManager(reloading: true);

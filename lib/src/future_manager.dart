@@ -234,6 +234,16 @@ class FutureManager<T> extends IManager<T> {
     return null;
   }
 
+  ///Clear the error on this manager
+  ///Only work when ViewState isn't error
+  ///Best use case with Pagination when there is an error and you want to clear the error to show loading again
+  void clearError() {
+    if (viewState != ManagerViewState.error) {
+      _error = null;
+      _notifyListeners(useMicrotask: false);
+    }
+  }
+
   ///Add [error] our current manager, reset current [data] if [updateViewState] to null
   ///
   @override
@@ -242,7 +252,7 @@ class FutureManager<T> extends IManager<T> {
     bool updateViewState = true,
     bool useMicrotask = false,
   }) {
-    var err = error is! FutureManagerError
+    FutureManagerError err = error is! FutureManagerError
         ? FutureManagerError(exception: error)
         : error;
     _error = err;

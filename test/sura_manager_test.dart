@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sura_manager/sura_manager.dart';
 
+///Find more test at example folder
 void main() {
   FutureManager<int> futureManager = FutureManager();
 
@@ -31,22 +32,4 @@ void main() {
     expect(futureManager.error!.runtimeType, FutureManagerError);
     expect(futureManager.error!.exception.runtimeType, HttpException);
   });
-
-  // test("Test future manger with loading", () async {
-  //   int? value;
-  //   await futureManager.asyncOperation(() async {
-  //     await Future.delayed(Duration(seconds: 2));
-  //     return 10;
-  //   }, onSuccess: (data) {
-  //     value = data;
-  //     return value!;
-  //   });
-  //   expect(value, 10);
-  //   futureManager.refresh(reloading: false).then((value) {
-  //     expect(futureManager.isLoading, false);
-  //     futureManager.refresh(reloading: true);
-  //     expect(futureManager.isLoading, true);
-  //   });
-  //   expect(futureManager.isLoading, false);
-  // });
 }

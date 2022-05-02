@@ -9,27 +9,37 @@ class SuraManagerWithPagination extends StatefulWidget {
   const SuraManagerWithPagination({Key? key}) : super(key: key);
 
   @override
-  _SuraManagerWithPaginationState createState() =>
-      _SuraManagerWithPaginationState();
+  _SuraManagerWithPaginationState createState() => _SuraManagerWithPaginationState();
 }
 
 class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
-  FutureManager<UserResponse> userController = FutureManager();
+  late FutureManager<UserResponse> userManager = FutureManager(
+    reloading: false,
+    onSuccess: (response) {
+      if (userManager.hasData) {
+        response.users = [...userManager.data!.users, ...response.users];
+      }
+      currentPage += 1;
+      return response;
+    },
+  );
   int currentPage = 1;
   int maxTimeToShowError = 0;
 
   Future fetchData([bool reload = false]) async {
-    await Future.delayed(const Duration(seconds: 1));
     if (reload) {
       currentPage = 1;
     }
-    userController.asyncOperation(
+    await userManager.asyncOperation(
       () async {
-        if (currentPage > 1 && maxTimeToShowError < 2) {
+        await Future.delayed(const Duration(seconds: 1));
+        // throw "Expected error thrown";
+        if (currentPage > 2 && maxTimeToShowError < 2) {
           maxTimeToShowError++;
           throw "Expected error thrown from asyncOperation";
         }
 
+        print("current page: $currentPage");
         final response = await Dio().get(
           "https://express-boilerplate-dev.lynical.com/api/user/all",
           queryParameters: {
@@ -39,13 +49,6 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
         );
         return UserResponse.fromJson(response.data);
       },
-      onSuccess: (response) {
-        if (userController.hasData) {
-          response.users = [...userController.data!.users, ...response.users];
-        }
-        currentPage += 1;
-        return response;
-      },
       reloading: reload,
     );
   }
@@ -53,8 +56,8 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
   @override
   void initState() {
     fetchData();
-    userController.addListener(() {
-      log(userController.toString());
+    userManager.addListener(() {
+      log(userManager.toString());
     });
     super.initState();
   }
@@ -64,13 +67,15 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
     return Scaffold(
       appBar: AppBar(title: const Text("Fetch all users with pagination")),
       body: FutureManagerBuilder<UserResponse>(
-        futureManager: userController,
+        futureManager: userManager,
+        // onRefreshing: () => const RefreshProgressIndicator(),
         ready: (context, UserResponse response) {
           return SuraPaginatedList(
             itemCount: response.users.length,
             hasMoreData: response.hasMoreData,
             padding: EdgeInsets.zero,
-            hasError: userController.hasError,
+            hasError: userManager.hasError,
+            // loadingWidget: emptySizedBox,
             itemBuilder: (context, index) {
               final user = response.users[index];
               return ListTile(
@@ -85,11 +90,11 @@ class _SuraManagerWithPaginationState extends State<SuraManagerWithPagination> {
             dataLoader: fetchData,
             errorWidget: Column(
               children: [
-                Text(userController.error.toString()),
+                Text(userManager.error.toString()),
                 IconButton(
                   onPressed: () {
-                    userController.clearError();
-                    fetchData();
+                    userManager.clearError();
+                    userManager.refresh();
                   },
                   icon: const Icon(Icons.refresh),
                 ),
@@ -108,17 +113,11 @@ class UserResponse {
 
   UserResponse({this.pagination, required this.users});
 
-  bool get hasMoreData =>
-      pagination != null ? users.length < pagination!.totalItems : false;
+  bool get hasMoreData => pagination != null ? users.length < pagination!.totalItems : false;
 
   factory UserResponse.fromJson(Map<String, dynamic> json) => UserResponse(
-        users: json["data"] == null
-            ? []
-            : List<UserModel>.from(
-                json["data"].map((x) => UserModel.fromJson(x))),
-        pagination: json["pagination"] == null
-            ? null
-            : Pagination.fromJson(json["pagination"]),
+        users: json["data"] == null ? [] : List<UserModel>.from(json["data"].map((x) => UserModel.fromJson(x))),
+        pagination: json["pagination"] == null ? null : Pagination.fromJson(json["pagination"]),
       );
 }
 

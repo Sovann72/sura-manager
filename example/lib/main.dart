@@ -12,15 +12,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SuraProvider(
-      errorWidget: (error, onRefresh) {
+    return SuraManagerProvider(
+      errorBuilder: (error, onRefresh) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(error.toString()),
-              TextButton(
-                  onPressed: onRefresh, child: const Icon(Icons.refresh)),
+              SuraAsyncButton(
+                fullWidth: false,
+                onPressed: onRefresh,
+                child: const Icon(Icons.refresh),
+              ),
             ],
           ),
         );
@@ -77,11 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(err.toString()),
-                ElevatedButton(
+                SuraAsyncButton(
+                  fullWidth: false,
                   onPressed: () {
-                    widget.dataManager.clearError();
+                    widget.dataManager.refresh(reloading: false);
                   },
-                  child: const Text("Clear error"),
+                  child: const Text("Refresh"),
                 ),
               ],
             ),
@@ -128,15 +132,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ElevatedButton(
                   key: const ValueKey("add-error"),
                   onPressed: () async {
-                    widget.dataManager.addError(
-                        const FutureManagerError(exception: "exception"));
+                    widget.dataManager.addError(const FutureManagerError(exception: "exception"));
                   },
                   child: const Text("Add error"),
                 ),
                 const SpaceY(24),
                 ElevatedButton(
                   key: const ValueKey("reset"),
-                  onPressed: widget.dataManager.resetData,
+                  onPressed: () => widget.dataManager.resetData(),
                   child: const Text("Reset"),
                 ),
               ],

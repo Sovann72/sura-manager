@@ -1,17 +1,17 @@
 ## [1.2.1] - 27 April 2022
 
-- add clearError
+- add `clearError` to FutureManager
 
 ## [1.2.0] - 26 April 2022
 
 **Small breaking changes**
 
-- add SuraManagerProvider
-- loadingWidget and ErrorWidget in SuraManager now using from SuraManagerProvider instead of SuraProvider
+- add `SuraManagerProvider`
+- `loadingWidget` and `ErrorWidget` in `SuraManager` now using from `SuraManagerProvider` instead of `SuraProvider`
 
 ## [1.1.0] - 25 April 2022
 
-- error from Manager now has a type of FutureManagerError instead of dynamic
+- `error` from Manager now has a type of `FutureManagerError` instead of dynamic
 
 ## [1.0.0] - 3 February 2022
 

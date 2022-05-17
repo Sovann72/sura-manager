@@ -1,3 +1,7 @@
+## [1.3.0] - 17 May 2022
+
+- add `cacheOption` to FutureManager's constructor. You can now cache the data within given time. `asyncOperation` and `refresh` now has a parameter option to use `cache` or not
+
 ## [1.2.1] - 27 April 2022
 
 - add `clearError` to FutureManager

@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:sura_manager/sura_manager.dart';
 
 /// A widget that build base on the state a [FutureManager]
-class FutureManagerBuilder<T> extends StatefulWidget {
+class FutureManagerBuilder<T extends Object> extends StatefulWidget {
   ///A required [FutureManager] that this widget depends on
   final FutureManager<T> futureManager;
 
-  /// A widget to show when [FutureManager] state is loading
+  ///A widget to show when [FutureManager] state is loading
   final Widget? loading;
 
-  /// A widget to show when [FutureManager] state is error
+  ///A widget to show when [FutureManager] state is error
   final Widget Function(FutureManagerError)? error;
 
-  /// A callback function that call when [FutureManager] state is error
+  ///A callback function that call when [FutureManager] state is error
   final void Function(FutureManagerError)? onError;
 
-  /// A callback function that call when [FutureManager] state is error
+  ///A callback function that call when [FutureManager] state is error
   final void Function(T)? onData;
 
   ///A widget to show on top of this widget when refreshing
@@ -24,7 +24,7 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   ///A widget to show when [FutureManager] has a data
   final Widget Function(BuildContext, T) ready;
 
-  /// A widget that build base on the state a [FutureManager]
+  // A widget that build base on the state a [FutureManager]
   const FutureManagerBuilder({
     Key? key,
     required this.futureManager,
@@ -39,7 +39,8 @@ class FutureManagerBuilder<T> extends StatefulWidget {
   _FutureManagerBuilderState createState() => _FutureManagerBuilderState<T>();
 }
 
-class _FutureManagerBuilderState<T> extends State<FutureManagerBuilder<T>> {
+class _FutureManagerBuilderState<T extends Object>
+    extends State<FutureManagerBuilder<T>> {
   //
   SuraManagerProvider? managerProvider;
 

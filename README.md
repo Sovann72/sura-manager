@@ -2,7 +2,7 @@
 
 ValueNotifier and ValueListenableBuilder but for asynchronous value.
 
-[![pub package](https://img.shields.io/badge/pub-1.3.0-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
+[![pub package](https://img.shields.io/badge/pub-1.4.0-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 
 # Installation
 
@@ -10,7 +10,7 @@ Add this to pubspec.yaml
 
 ```dart
 dependencies:
-  sura_manager: ^1.3.0
+  sura_manager: ^1.4.0
 ```
 
 ### Use case and motivation:
@@ -58,13 +58,14 @@ Widget(BuildContext context){
 | onError        | a callback function called after operation has an error                                        | null    |
 | cacheOption    | an option to cache data.                                                                       | non     |
 
-| field    | description                                |
-| -------- | ------------------------------------------ |
-| data     | current data in the Manager                |
-| error    | error in the Manager                       |
-| hasData  | check if our Manager has a data            |
-| hasError | check if our Manager has an error          |
-| future   | future field of the current futureFunction |
+| field        | description                                |
+| ------------ | ------------------------------------------ |
+| data         | current data in the Manager                |
+| error        | error in the Manager                       |
+| hasData      | check if our Manager has a data            |
+| hasError     | check if our Manager has an error          |
+| future       | future field of the current futureFunction |
+| isRefreshing | check if our Manager is refreshing         |
 
 | Method         | description                                                                                                                                                         |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

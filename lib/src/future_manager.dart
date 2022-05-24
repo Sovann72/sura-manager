@@ -78,7 +78,10 @@ class FutureManager<T extends Object> extends IManager<T> {
   FutureManagerError? _error;
 
   //A field for checking state of Manager
-  bool get isRefreshing => hasData || hasError;
+  bool get isRefreshing =>
+      hasDataOrError &&
+      _processingState.value == ManagerProcessState.processing;
+  bool get hasDataOrError => (hasData || hasError);
   bool get hasData => _data != null;
   bool get hasError => _error != null;
   bool _disposed = false;
@@ -161,7 +164,7 @@ class FutureManager<T extends Object> extends IManager<T> {
       }
       //
       bool triggerError = true;
-      if (isRefreshing) {
+      if (hasDataOrError) {
         triggerError = shouldReload;
       }
       try {

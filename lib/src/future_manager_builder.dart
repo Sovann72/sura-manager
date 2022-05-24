@@ -105,15 +105,9 @@ class _FutureManagerBuilderState<T extends Object>
       alignment: Alignment.topCenter,
       children: [
         managerWidget,
-        if (widget.futureManager.isRefreshing) ...[
-          ValueListenableBuilder<ManagerProcessState>(
-            valueListenable: widget.futureManager.processingState,
-            builder: (context, value, child) {
-              if (value == ManagerProcessState.processing) return child!;
-              return const SizedBox();
-            },
-            child: widget.onRefreshing!.call(),
-          ),
+        if (widget.futureManager.isRefreshing &&
+            widget.onRefreshing != null) ...[
+          widget.onRefreshing!.call(),
         ],
       ],
     );

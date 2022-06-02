@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../sura_manager.dart';
 
 mixin ManagerProviderMixin<T extends StatefulWidget> on State<T> {
-  ManagerRef ref = ManagerRef();
+  final ManagerRef ref = ManagerRef();
 
   @override
   void dispose() {
-    ref.dispose();
+    ref._dispose();
     super.dispose();
   }
 }
@@ -17,14 +17,14 @@ class ManagerRef {
   FutureManager<T> read<T extends Object>(ManagerProvider<T> provider,
       {Map<String, dynamic>? param}) {
     if (_ManagerStore.store[provider] == null) {
-      provider.data = provider._create(param);
+      provider._data = provider._create(param);
     }
     _providers.add(provider);
     _ManagerStore.addListener(provider);
-    return provider.data as FutureManager<T>;
+    return provider._data as FutureManager<T>;
   }
 
-  void dispose() {
+  void _dispose() {
     for (var provider in _providers) {
       _ManagerStore.removeListener(provider);
     }
@@ -44,14 +44,14 @@ class _ManagerStore {
     if (store[provider] == null) return;
     store[provider] = store[provider]! - 1;
     if (store[provider] == 0) {
-      provider.data?.dispose();
+      provider._data?.dispose();
       store.remove(provider);
     }
   }
 }
 
 class ManagerProvider<T extends Object> {
-  FutureManager? data;
+  FutureManager? _data;
   final FutureManager<T> Function(Map<String, dynamic>? param) _create;
 
   ManagerProvider(this._create);

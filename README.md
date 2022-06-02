@@ -2,7 +2,7 @@
 
 ValueNotifier and ValueListenableBuilder but for asynchronous value.
 
-[![pub package](https://img.shields.io/badge/pub-1.4.0-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
+[![pub package](https://img.shields.io/badge/pub-1.5.0-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 
 # Installation
 
@@ -10,7 +10,7 @@ Add this to pubspec.yaml
 
 ```dart
 dependencies:
-  sura_manager: ^1.4.0
+  sura_manager: ^1.5.0
 ```
 
 ### Use case and motivation:
@@ -142,3 +142,12 @@ class _HomePageState extends State<NewPage> {
 | onError       | A callback function that call when [FutureManager] state is error                      | null                      |
 | onData        | A callback function that call when [FutureManager] state has a data or data is updated | null                      |
 | onRefreshing  | A widget to show on top of this widget when refreshing                                 | null                      |
+
+
+
+## Ecosystem and usage
+
+- Q: when to use `cacheOption`? 
+A: When you have a global manager and want to preserve data on a period of time without running asyncOpertion's logic or futureFunction again.
+- Q: when to use `ManagerProvider`?
+A: When you want to use FutureManager accross multiple widget(but not global) without declaring it as a global variable. By doing this, FutureManager will be auto dispose and recreate each time its first used. This work the same way as Riverpod with autoDispose.

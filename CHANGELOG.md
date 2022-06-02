@@ -1,3 +1,10 @@
+## [1.5.0] - 0 June 2022
+
+- Add Provider mechanism for FutureManager
+   - `ManagerProvider`: Create a provider for FutureManager
+   - `ManagerProviderMixin`: A mixin on StatefulWidget to access FutureManager's Ref
+   - `ManagerConsumer`: Access FutureManager's Ref via Stateless Widget
+
 ## [1.4.0] - 25 May 2022
 
 - fix `isRefreshing` isn't exactly what it is

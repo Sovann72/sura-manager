@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
 import 'package:sura_manager_example/test_pagination.dart';
+import 'package:sura_manager_example/test_store.dart';
 
 void main() {
   runApp(const MyApp());
@@ -147,11 +148,22 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          SuraPageNavigator.push(context, const SuraManagerWithPagination());
-        },
-        child: const Icon(Icons.assessment),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              SuraPageNavigator.push(context, const SuraManagerWithPagination());
+            },
+            child: const Icon(Icons.assessment),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              SuraPageNavigator.push(context, const TestManagerStore());
+            },
+            child: const Icon(Icons.shopping_cart),
+          ),
+        ],
       ),
     );
   }

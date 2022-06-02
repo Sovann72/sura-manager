@@ -57,8 +57,7 @@ class FutureManager<T> extends IManager<T> {
   T? _data;
   FutureManagerError? _error;
   ManagerViewState _viewState = ManagerViewState.loading;
-  final ValueNotifier<ManagerProcessState> _processingState =
-      ValueNotifier(ManagerProcessState.idle);
+  final ValueNotifier<ManagerProcessState> _processingState = ValueNotifier(ManagerProcessState.idle);
 
   ManagerViewState get viewState => _viewState;
   ValueNotifier<ManagerProcessState> get processingState => _processingState;
@@ -110,8 +109,7 @@ class FutureManager<T> extends IManager<T> {
     bool? throwError,
   }) refresh = _emptyRefreshFunction;
 
-  Future<T?> _emptyRefreshFunction(
-      {reloading, onSuccess, onDone, onError, throwError}) async {
+  Future<T?> _emptyRefreshFunction({reloading, onSuccess, onDone, onError, throwError}) async {
     log("refresh() is depend on asyncOperation(),"
         " You need to call asyncOperation() once before you can call refresh()");
     return null;
@@ -182,16 +180,14 @@ class FutureManager<T> extends IManager<T> {
   }
 
   ///[useMicrotask] param can be use to prevent schedule rebuilt while navigating or rebuilt
-  void _updateManagerViewState(ManagerViewState state,
-      {bool useMicrotask = false}) {
+  void _updateManagerViewState(ManagerViewState state, {bool useMicrotask = false}) {
     if (_disposed) return;
     _viewState = state;
     _notifyListeners(useMicrotask: useMicrotask);
   }
 
   ///Wrap with [microtask] to prevent schedule rebuilt while navigating or rebuilt
-  void _updateManagerProcessState(ManagerProcessState state,
-      {bool useMicrotask = false}) {
+  void _updateManagerProcessState(ManagerProcessState state, {bool useMicrotask = false}) {
     if (_disposed) return;
 
     void update() {
@@ -225,10 +221,8 @@ class FutureManager<T> extends IManager<T> {
     if (data != null) {
       _data = data;
       _error = null;
-      _updateManagerProcessState(ManagerProcessState.ready,
-          useMicrotask: useMicrotask);
-      _updateManagerViewState(ManagerViewState.ready,
-          useMicrotask: useMicrotask);
+      _updateManagerProcessState(ManagerProcessState.ready, useMicrotask: useMicrotask);
+      _updateManagerViewState(ManagerViewState.ready, useMicrotask: useMicrotask);
       return data;
     }
     return null;
@@ -252,9 +246,7 @@ class FutureManager<T> extends IManager<T> {
     bool updateViewState = true,
     bool useMicrotask = false,
   }) {
-    FutureManagerError err = error is! FutureManagerError
-        ? FutureManagerError(exception: error)
-        : error;
+    FutureManagerError err = error is! FutureManagerError ? FutureManagerError(exception: error) : error;
     _error = err;
     if (updateViewState) {
       _data = null;

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
-import 'package:sura_manager_example/test_pagination.dart';
-import 'package:sura_manager_example/test_store.dart';
+import 'package:sura_manager_example/src/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,135 +34,11 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: MyHomePage(
-          dataManager: FutureManager(reloading: true),
+          dataManager: () => FutureManager(
+            reloading: true,
+            cacheOption: const ManagerCacheOption.non(),
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  final FutureManager<int> dataManager;
-  const MyHomePage({Key? key, required this.dataManager}) : super(key: key);
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  void initState() {
-    widget.dataManager.asyncOperation(() async {
-      await Future.delayed(const Duration(milliseconds: 1500));
-      return 10;
-    });
-
-    widget.dataManager.addListener(() {
-      debugPrint(widget.dataManager.toString());
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    //Use with FutureManagerBuilder
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("FutureManager example"),
-      ),
-      body: FutureManagerBuilder<int>(
-        futureManager: widget.dataManager,
-        onRefreshing: () => const RefreshProgressIndicator(),
-        loading: const Center(child: CircularProgressIndicator()),
-        error: (err) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(err.toString()),
-                SuraAsyncButton(
-                  fullWidth: false,
-                  onPressed: () {
-                    widget.dataManager.refresh(reloading: false);
-                  },
-                  child: const Text("Refresh"),
-                ),
-              ],
-            ),
-          );
-        },
-        onError: (err) {
-          //debugdebugPrint("We got an error: $err");
-        },
-        onData: (data) {
-          // debugPrint("We got a data: $data");
-        },
-        ready: (context, data) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "$data",
-                  key: const ValueKey("data"),
-                ),
-                const SpaceY(24),
-                ElevatedButton(
-                  key: const ValueKey("add"),
-                  onPressed: () async {
-                    await widget.dataManager.modifyData((data) {
-                      return data! + 10;
-                    });
-                  },
-                  child: const Text("Add 10"),
-                ),
-                const SpaceY(24),
-                ElevatedButton(
-                  key: const ValueKey("refresh"),
-                  onPressed: widget.dataManager.refresh,
-                  child: const Text("Refresh"),
-                ),
-                const SpaceY(24),
-                ElevatedButton(
-                  key: const ValueKey("refresh-no-reload"),
-                  onPressed: () => widget.dataManager.refresh(reloading: false),
-                  child: const Text("Refresh without reload"),
-                ),
-                const SpaceY(24),
-                ElevatedButton(
-                  key: const ValueKey("add-error"),
-                  onPressed: () async {
-                    widget.dataManager.addError(const FutureManagerError(exception: "exception"));
-                  },
-                  child: const Text("Add error"),
-                ),
-                const SpaceY(24),
-                ElevatedButton(
-                  key: const ValueKey("reset"),
-                  onPressed: () => widget.dataManager.resetData(),
-                  child: const Text("Reset"),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              SuraPageNavigator.push(context, const SuraManagerWithPagination());
-            },
-            child: const Icon(Icons.assessment),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              SuraPageNavigator.push(context, const TestManagerStore());
-            },
-            child: const Icon(Icons.shopping_cart),
-          ),
-        ],
       ),
     );
   }

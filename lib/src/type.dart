@@ -1,10 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 typedef FutureFunction<T> = Future<T> Function();
 typedef SuccessCallBack<T> = FutureOr<T> Function(T);
 typedef ErrorCallBack = void Function(FutureManagerError);
+typedef ManagerProcessListener<T> = void Function(ManagerProcessState, T?);
+//
+typedef OnManagerError = void Function(FutureManagerError, BuildContext);
+typedef ManagerErrorBuilder = Widget Function(
+    FutureManagerError, AsyncCallback?);
 
 Widget _emptyErrorFn(_) {
   return const SizedBox();

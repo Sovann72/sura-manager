@@ -14,7 +14,8 @@ class TestManagerStore extends StatefulWidget {
   State<TestManagerStore> createState() => _TestManagerStoreState();
 }
 
-class _TestManagerStoreState extends State<TestManagerStore> with ManagerProviderMixin {
+class _TestManagerStoreState extends State<TestManagerStore>
+    with ManagerProviderMixin {
   late final manager = ref.read(provider);
 
   @override

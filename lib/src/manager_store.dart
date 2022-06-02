@@ -14,7 +14,8 @@ mixin ManagerProviderMixin<T extends StatefulWidget> on State<T> {
 
 class ManagerRef {
   final List<ManagerProvider> _providers = [];
-  FutureManager<T> read<T extends Object>(ManagerProvider<T> provider, {Map<String, dynamic>? param}) {
+  FutureManager<T> read<T extends Object>(ManagerProvider<T> provider,
+      {Map<String, dynamic>? param}) {
     if (_ManagerStore.store[provider] == null) {
       provider.data = provider._create(param);
     }
@@ -65,7 +66,8 @@ abstract class ManagerConsumer extends StatefulWidget {
   State<ManagerConsumer> createState() => _ManagerConsumerState();
 }
 
-class _ManagerConsumerState extends State<ManagerConsumer> with ManagerProviderMixin {
+class _ManagerConsumerState extends State<ManagerConsumer>
+    with ManagerProviderMixin {
   @override
   Widget build(BuildContext context) {
     return widget.build(context, ref);

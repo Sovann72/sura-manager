@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sura_manager/sura_manager.dart';
-import 'package:sura_manager_example/main.dart';
+import 'package:sura_manager_example/src/home.dart';
 
 void main() {
   testWidgets('FutureManagerBuilder test all state',
@@ -13,7 +13,7 @@ void main() {
     ///Pump the app
     await tester.pumpWidget(
       MaterialApp(
-        home: MyHomePage(dataManager: manager),
+        home: MyHomePage(dataManager: () => manager),
       ),
     );
     await tester.pump(twosecond);

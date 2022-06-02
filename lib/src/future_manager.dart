@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sura_manager/src/imanager.dart';
 
 import 'future_manager_builder.dart';
+import 'manager_cache.dart';
 import 'type.dart';
 
 ///[FutureManager] is a wrap around [Future] and [ChangeNotifier]
@@ -12,15 +13,15 @@ import 'type.dart';
 ///[FutureManager] use [FutureManagerBuilder] instead of FutureBuilder to handle data
 ///
 ///[FutureManager] provide a method [asyncOperation] to handle or call async function
-class FutureManager<T> extends IManager<T> {
+class FutureManager<T extends Object> extends IManager<T> {
   ///A future function that return the type of T
   final FutureFunction<T>? futureFunction;
 
-  /// A function that call after [asyncOperation] is success and you want to manipulate data before
-  /// adding it to manager
+  ///A function that call after [asyncOperation] is success and you want to manipulate data before
+  ///adding it to manager
   final SuccessCallBack<T>? onSuccess;
 
-  /// A function that call after everything is done
+  ///A function that call after everything is done
   final VoidCallback? onDone;
 
   /// A function that call after there is an error in our [asyncOperation]
@@ -30,10 +31,16 @@ class FutureManager<T> extends IManager<T> {
   /// default value is [false]
   final bool reloading;
 
+  ///An option to cache Manager's data
+  ///This is not a storage cache or memory cache.
+  ///Data is cache within lifetime of FutureManager only
+  final ManagerCacheOption cacheOption;
+
   ///Create a FutureManager instance, You can define a [futureFunction] here then [asyncOperation] will be call immediately
   FutureManager({
     this.futureFunction,
     this.reloading = true,
+    this.cacheOption = const ManagerCacheOption.non(),
     this.onSuccess,
     this.onDone,
     this.onError,
@@ -53,22 +60,34 @@ class FutureManager<T> extends IManager<T> {
   ///Sometime you want to use [FutureManager] class with FutureBuilder, so you can use this field
   Future<T>? future;
 
-  ///
-  T? _data;
-  FutureManagerError? _error;
-  ManagerViewState _viewState = ManagerViewState.loading;
-  final ValueNotifier<ManagerProcessState> _processingState = ValueNotifier(ManagerProcessState.idle);
-
+  ///View state of Manager that control which Widget to build in FutureManagerBuilder
   ManagerViewState get viewState => _viewState;
-  ValueNotifier<ManagerProcessState> get processingState => _processingState;
-  T? get data => _data;
-  FutureManagerError? get error => _error;
+  ManagerViewState _viewState = ManagerViewState.loading;
 
-  ///
-  bool get isRefreshing => hasData || hasError;
+  ///Processing state of Manager. Usually useful for any lister
+  ValueNotifier<ManagerProcessState> get processingState => _processingState;
+  final ValueNotifier<ManagerProcessState> _processingState =
+      ValueNotifier(ManagerProcessState.idle);
+
+  ///Manager's data
+  T? get data => _data;
+  T? _data;
+
+  ///Manager's error
+  FutureManagerError? get error => _error;
+  FutureManagerError? _error;
+
+  //A field for checking state of Manager
+  bool get isRefreshing =>
+      hasDataOrError &&
+      _processingState.value == ManagerProcessState.processing;
+  bool get hasDataOrError => (hasData || hasError);
   bool get hasData => _data != null;
   bool get hasError => _error != null;
   bool _disposed = false;
+
+  //Cache option
+  int? _lastCacheDuration;
 
   @override
   Widget when({
@@ -106,10 +125,12 @@ class FutureManager<T> extends IManager<T> {
     SuccessCallBack<T>? onSuccess,
     VoidCallback? onDone,
     ErrorCallBack? onError,
-    bool? throwError,
+    bool throwError,
+    bool useCache,
   }) refresh = _emptyRefreshFunction;
 
-  Future<T?> _emptyRefreshFunction({reloading, onSuccess, onDone, onError, throwError}) async {
+  Future<T?> _emptyRefreshFunction(
+      {reloading, onSuccess, onDone, onError, throwError, useCache}) async {
     log("refresh() is depend on asyncOperation(),"
         " You need to call asyncOperation() once before you can call refresh()");
     return null;
@@ -123,16 +144,27 @@ class FutureManager<T> extends IManager<T> {
     VoidCallback? onDone,
     ErrorCallBack? onError,
     bool throwError = false,
+    bool useCache = true,
   }) async {
-    refresh = ({reloading, onSuccess, onDone, onError, throwError}) async {
+    refresh = (
+        {reloading,
+        onSuccess,
+        onDone,
+        onError,
+        throwError = false,
+        useCache = false}) async {
       bool shouldReload = reloading ?? this.reloading;
       SuccessCallBack<T>? successCallBack = onSuccess ?? this.onSuccess;
       ErrorCallBack? errorCallBack = onError ?? this.onError;
       VoidCallback? onOperationDone = onDone ?? this.onDone;
-      bool? shouldThrowError = throwError ?? false;
+      bool shouldThrowError = throwError;
+      //useCache is always default to `false` if we call refresh directly
+      if (_enableCache && useCache) {
+        return data!;
+      }
       //
       bool triggerError = true;
-      if (isRefreshing) {
+      if (hasDataOrError) {
         triggerError = shouldReload;
       }
       try {
@@ -167,7 +199,21 @@ class FutureManager<T> extends IManager<T> {
       onDone: onDone,
       onError: onError,
       throwError: throwError,
+      useCache: useCache,
     );
+  }
+
+  bool get _enableCache {
+    if (_lastCacheDuration == null) return false;
+
+    bool lastCacheIsExpired() {
+      int now = DateTime.now().millisecondsSinceEpoch;
+      int expiredTime =
+          _lastCacheDuration! + cacheOption.cacheTime.inMilliseconds;
+      return now > expiredTime;
+    }
+
+    return cacheOption.useCache && hasData && !lastCacheIsExpired();
   }
 
   ///Custom [notifyListeners] to support Future that can be useful in some casse
@@ -180,14 +226,16 @@ class FutureManager<T> extends IManager<T> {
   }
 
   ///[useMicrotask] param can be use to prevent schedule rebuilt while navigating or rebuilt
-  void _updateManagerViewState(ManagerViewState state, {bool useMicrotask = false}) {
+  void _updateManagerViewState(ManagerViewState state,
+      {bool useMicrotask = false}) {
     if (_disposed) return;
     _viewState = state;
     _notifyListeners(useMicrotask: useMicrotask);
   }
 
   ///Wrap with [microtask] to prevent schedule rebuilt while navigating or rebuilt
-  void _updateManagerProcessState(ManagerProcessState state, {bool useMicrotask = false}) {
+  void _updateManagerProcessState(ManagerProcessState state,
+      {bool useMicrotask = false}) {
     if (_disposed) return;
 
     void update() {
@@ -221,11 +269,20 @@ class FutureManager<T> extends IManager<T> {
     if (data != null) {
       _data = data;
       _error = null;
-      _updateManagerProcessState(ManagerProcessState.ready, useMicrotask: useMicrotask);
-      _updateManagerViewState(ManagerViewState.ready, useMicrotask: useMicrotask);
+      _updateManagerProcessState(ManagerProcessState.ready,
+          useMicrotask: useMicrotask);
+      _updateManagerViewState(ManagerViewState.ready,
+          useMicrotask: useMicrotask);
+      _updateLastCacheDuration();
       return data;
     }
     return null;
+  }
+
+  void _updateLastCacheDuration() {
+    if (cacheOption.useCache) {
+      _lastCacheDuration = DateTime.now().millisecondsSinceEpoch;
+    }
   }
 
   ///Clear the error on this manager
@@ -246,7 +303,9 @@ class FutureManager<T> extends IManager<T> {
     bool updateViewState = true,
     bool useMicrotask = false,
   }) {
-    FutureManagerError err = error is! FutureManagerError ? FutureManagerError(exception: error) : error;
+    FutureManagerError err = error is! FutureManagerError
+        ? FutureManagerError(exception: error)
+        : error;
     _error = err;
     if (updateViewState) {
       _data = null;
@@ -263,8 +322,8 @@ class FutureManager<T> extends IManager<T> {
     );
   }
 
-  ///Reset all [data] and [error] to [loading] state.
-  ///Only [notifyListeners] if [updateViewState] is false.
+  ///Reset all [data] and [error] to [loading] state if [updateViewState] is true only.
+  ///if [updateViewState] is false, only notifyListener and update ManagerProcessState.
   @override
   Future<void> resetData({bool updateViewState = true}) async {
     const bool useMicroTask = true;
@@ -286,13 +345,20 @@ class FutureManager<T> extends IManager<T> {
 
   @override
   String toString() {
-    return "Data: $_data, Error: $_error, ViewState: $viewState, ProcessState: $processingState";
+    String logContent =
+        "Data: $_data, Error: $_error, ViewState: $viewState, ProcessState: $processingState";
+    if (_lastCacheDuration != null) {
+      logContent +=
+          ", cacheDuration: ${DateTime.fromMillisecondsSinceEpoch(_lastCacheDuration!)}";
+    }
+    return logContent;
   }
 
   @override
   void dispose() {
     _data = null;
     _error = null;
+    _lastCacheDuration = null;
     _processingState.dispose();
     _disposed = true;
     super.dispose();

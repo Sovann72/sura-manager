@@ -2,7 +2,7 @@
 
 ValueNotifier and ValueListenableBuilder but for asynchronous value.
 
-[![pub package](https://img.shields.io/badge/pub-1.2.1-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
+[![pub package](https://img.shields.io/badge/pub-1.4.0-blueviolet.svg)](https://pub.dev/packages/sura_manager) ![Latest commit](https://badgen.net/github/last-commit/asurraa/sura_manager)
 
 # Installation
 
@@ -10,7 +10,7 @@ Add this to pubspec.yaml
 
 ```dart
 dependencies:
-  sura_manager: ^1.2.1
+  sura_manager: ^1.4.0
 ```
 
 ### Use case and motivation:
@@ -39,7 +39,6 @@ Widget(BuildContext context){
         return ElevatedButton(
           child: Text("My data: ${data}"),
           onPressed: (){
-            //Call the future function again
             dataManager.refresh();
           },
         ),
@@ -57,14 +56,16 @@ Widget(BuildContext context){
 | onSuccess      | a callback function called after operation is success                                          | null    |
 | onDone         | a callback function called after operation is completely done, similar to finally in try-catch | null    |
 | onError        | a callback function called after operation has an error                                        | null    |
+| cacheOption    | an option to cache data.                                                                       | non     |
 
-| field    | description                                |
-| -------- | ------------------------------------------ |
-| data     | current data in the Manager                |
-| error    | error in the Manager                       |
-| hasData  | check if our Manager has a data            |
-| hasError | check if our Manager has an error          |
-| future   | future field of the current futureFunction |
+| field        | description                                |
+| ------------ | ------------------------------------------ |
+| data         | current data in the Manager                |
+| error        | error in the Manager                       |
+| hasData      | check if our Manager has a data            |
+| hasError     | check if our Manager has an error          |
+| future       | future field of the current futureFunction |
+| isRefreshing | check if our Manager is refreshing         |
 
 | Method         | description                                                                                                                                                         |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -93,6 +94,12 @@ class _HomePageState extends State<NewPage> {
       return 10;
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    dataManager.dispose();
+    super.dispose();
   }
 
   @override

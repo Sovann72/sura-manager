@@ -74,7 +74,7 @@ Widget(BuildContext context){
 | refresh        | call the asyncOperation again. we have to assign futureFunction from the constructor or call asyncOperation once to run this method, otherwise it will log an error |
 | updateData     | a method to update data in our Manager                                                                                                                              |
 | modifyData     | a method to update data in our Manager with data callback, prefer using this method to update data.                                                                 |
-| resetData      | reset eveything to loading or null state                                                                                                                            |
+| resetData      | reset everything to loading or null state                                                                                                                            |
 | addError       | add error into our manager                                                                                                                                          |
 | clearError     | clear error in the manager but only work if ViewState isn't in error state                                                                                          |
 

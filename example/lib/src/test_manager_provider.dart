@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
 
-final provider = ManagerProvider((param) {
+final provider = ManagerProvider((ref, param) {
+  int second = param as int;
+  ref.onDispose(() {
+    infoLog("Manager is disposing");
+  });
   return FutureManager<int>(
-    futureFunction: () => Future.delayed(const Duration(seconds: 1), () => 1),
+    futureFunction: () => Future.delayed(Duration(seconds: second), () => second),
   );
 });
 
-class TestManagerStore extends StatefulWidget {
-  const TestManagerStore({Key? key}) : super(key: key);
+class TestManagerProvider extends StatefulWidget {
+  const TestManagerProvider({Key? key}) : super(key: key);
 
   @override
-  State<TestManagerStore> createState() => _TestManagerStoreState();
+  State<TestManagerProvider> createState() => _TestManagerProviderState();
 }
 
-class _TestManagerStoreState extends State<TestManagerStore>
-    with ManagerProviderMixin {
-  late final manager = ref.read(provider);
+class _TestManagerProviderState extends State<TestManagerProvider> with ManagerProviderMixin {
+  late final manager = ref.read(provider, param: 3);
 
   @override
   Widget build(BuildContext context) {

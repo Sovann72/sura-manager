@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../sura_manager.dart';
 
+typedef DisposeFunction = void Function(VoidCallback);
+
+///Mixin on StatefulWidget's state class to access [ManagerRef]
 mixin ManagerProviderMixin<T extends StatefulWidget> on State<T> {
   final ManagerRef ref = ManagerRef();
 
@@ -12,21 +15,32 @@ mixin ManagerProviderMixin<T extends StatefulWidget> on State<T> {
   }
 }
 
-class ManagerRef {
+///
+abstract class _ManagerDisposable {
+  void onDispose(void Function() cb);
+}
+
+class ManagerRef extends _ManagerDisposable {
+  // ignore: prefer_function_declarations_over_variables
+  VoidCallback disposeCallBack = () {};
+  @override
+  void onDispose(void Function() cb) {
+    disposeCallBack = cb;
+  }
+
   final List<ManagerProvider> _providers = [];
-  FutureManager<T> read<T extends Object>(ManagerProvider<T> provider,
-      {Map<String, dynamic>? param}) {
+  FutureManager<T> read<T extends Object>(ManagerProvider<T> provider, {Object? param}) {
     if (_ManagerStore.store[provider] == null) {
-      provider._data = provider._create(param);
+      provider._manager = provider._create(this, param);
     }
     _providers.add(provider);
     _ManagerStore.addListener(provider);
-    return provider._data as FutureManager<T>;
+    return provider._manager as FutureManager<T>;
   }
 
   void _dispose() {
     for (var provider in _providers) {
-      _ManagerStore.removeListener(provider);
+      _ManagerStore.removeListener(provider, disposeCallBack);
     }
     _providers.clear();
   }
@@ -40,23 +54,25 @@ class _ManagerStore {
     store[provider] = store[provider]! + 1;
   }
 
-  static void removeListener<T extends Object>(ManagerProvider<T> provider) {
+  static void removeListener<T extends Object>(ManagerProvider<T> provider, VoidCallback onDispose) {
     if (store[provider] == null) return;
     store[provider] = store[provider]! - 1;
     if (store[provider] == 0) {
-      provider._data?.dispose();
+      onDispose.call();
+      provider._manager?.dispose();
       store.remove(provider);
     }
   }
 }
 
+///Create a provider for [FutureManager]
 class ManagerProvider<T extends Object> {
-  FutureManager? _data;
-  final FutureManager<T> Function(Map<String, dynamic>? param) _create;
-
+  FutureManager? _manager;
+  final FutureManager<T> Function(ManagerRef, Object?) _create;
   ManagerProvider(this._create);
 }
 
+///Extends this class instead of Stateless widget to access [ManagerRef]
 abstract class ManagerConsumer extends StatefulWidget {
   const ManagerConsumer({Key? key}) : super(key: key);
 
@@ -66,8 +82,7 @@ abstract class ManagerConsumer extends StatefulWidget {
   State<ManagerConsumer> createState() => _ManagerConsumerState();
 }
 
-class _ManagerConsumerState extends State<ManagerConsumer>
-    with ManagerProviderMixin {
+class _ManagerConsumerState extends State<ManagerConsumer> with ManagerProviderMixin {
   @override
   Widget build(BuildContext context) {
     return widget.build(context, ref);

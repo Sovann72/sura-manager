@@ -92,6 +92,18 @@ class _FutureManagerBuilderState<T extends Object>
   }
 
   @override
+  void didUpdateWidget(covariant FutureManagerBuilder<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.futureManager != oldWidget.futureManager) {
+      oldWidget.futureManager.removeListener(managerListener);
+      oldWidget.futureManager.processingState
+          .removeListener(processStateListener);
+      widget.futureManager.addListener(managerListener);
+      widget.futureManager.processingState.addListener(processStateListener);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     managerProvider = SuraManagerProvider.of(context);
     final Widget managerWidget = _buildWidgetByState();

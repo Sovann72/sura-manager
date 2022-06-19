@@ -10,10 +10,10 @@ class SuraManagerProvider extends InheritedWidget {
     this.onFutureManagerError,
   }) : super(child: child, key: key);
 
-  ///Loading widget use in [Manager] class
+  ///Loading widget use in [Manager] builder class
   final Widget? managerLoadingBuilder;
 
-  ///Error widget use in [Manager] class
+  ///Error widget use in [Manager] builder class
   final ManagerErrorBuilder? errorBuilder;
 
   ///A callback function that run if FutureManagerBuilder has an error

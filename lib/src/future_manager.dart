@@ -93,7 +93,7 @@ class FutureManager<T extends Object> extends IManager<T> {
   Widget when({
     required Widget Function(T) ready,
     Widget? loading,
-    Widget Function(dynamic)? error,
+    Widget Function(FutureManagerError)? error,
   }) {
     return FutureManagerBuilder<T>(
       futureManager: this,
@@ -107,7 +107,7 @@ class FutureManager<T extends Object> extends IManager<T> {
   Widget listen({
     required Widget Function(T) ready,
     Widget loading = const SizedBox(),
-    Widget Function(dynamic) error = EmptyErrorFunction,
+    Widget Function(FutureManagerError) error = EmptyErrorFunction,
   }) {
     return FutureManagerBuilder<T>(
       futureManager: this,
@@ -216,7 +216,7 @@ class FutureManager<T extends Object> extends IManager<T> {
     return cacheOption.useCache && hasData && !lastCacheIsExpired();
   }
 
-  ///Custom [notifyListeners] to support Future that can be useful in some casse
+  ///Custom [notifyListeners] to support Future that can be useful in some case
   void _notifyListeners({required bool useMicrotask}) {
     if (useMicrotask) {
       Future.microtask(() => notifyListeners());

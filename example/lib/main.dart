@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
                 onPressed: onRefresh,
                 child: const Icon(Icons.refresh),
               ),
+              // AnimatedBuilder(animation: animation, builder: builder)
             ],
           ),
         );

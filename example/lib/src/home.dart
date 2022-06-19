@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //debugdebugPrint("We got an error: $err");
         },
         onData: (data) {
-          // debugPrint("We got a data: $data");
+          SuraPageNavigator.push(context, const CacheGlobalManager());
         },
         ready: (context, data) {
           return Center(

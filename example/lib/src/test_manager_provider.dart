@@ -2,13 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
 
-final provider = ManagerProvider((ref, param) {
-  int second = param as int;
+final provider = ManagerProvider((ref) {
   ref.onDispose(() {
     infoLog("Manager is disposing");
   });
+  print("simple provider created");
   return FutureManager<int>(
-    futureFunction: () => Future.delayed(Duration(seconds: second), () => second),
+    futureFunction: () => Future.delayed(const Duration(seconds: 2), () => 2),
+  );
+});
+
+final familyProvider = ManagerProvider<String, String>.family((ref, param) {
+  ref.onDispose(() {
+    infoLog("Manager is disposing");
+  });
+  print("Family provider created");
+  return FutureManager<String>(
+    futureFunction: () => Future.delayed(const Duration(seconds: 2), () => "2"),
   );
 });
 
@@ -20,12 +30,13 @@ class TestManagerProvider extends StatefulWidget {
 }
 
 class _TestManagerProviderState extends State<TestManagerProvider> with ManagerProviderMixin {
-  late final manager = ref.read(provider, param: 3);
+  late final manager = ref.read(provider(2));
+  late final familyManager = ref.read(familyProvider("2"));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Manager Store test")),
+      appBar: AppBar(title: const Text("Manager Provider test")),
       body: manager.when(
         ready: (data) {
           return Center(
@@ -39,6 +50,29 @@ class _TestManagerProviderState extends State<TestManagerProvider> with ManagerP
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          SuraPageNavigator.push(
+            context,
+            ManagerConsumerBuilder(
+              builder: (context, ref) {
+                return Scaffold(
+                  appBar: AppBar(),
+                  body: Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        ref.read(provider).modifyData((p0) => p0! + 30);
+                      },
+                      child: const Text("Update"),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
@@ -50,7 +84,7 @@ class StatelessManagerStore extends ManagerConsumer {
   Widget build(BuildContext context, ref) {
     return Container(
       margin: const EdgeInsets.only(top: 32),
-      child: ref.read(provider).when(
+      child: ref.read(provider).listen(
         ready: (data) {
           return ElevatedButton(
             child: Text("$data"),

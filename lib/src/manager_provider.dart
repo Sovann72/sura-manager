@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../sura_manager.dart';
 
-typedef DisposeFunction = void Function(VoidCallback);
-
 ///Mixin on StatefulWidget's state class to access [ManagerRef]
 mixin ManagerProviderMixin<T extends StatefulWidget> on State<T> {
   final ManagerRef ref = ManagerRef();
@@ -13,63 +11,6 @@ mixin ManagerProviderMixin<T extends StatefulWidget> on State<T> {
     ref._dispose();
     super.dispose();
   }
-}
-
-///
-abstract class _ManagerDisposable {
-  void onDispose(void Function() cb);
-}
-
-class ManagerRef extends _ManagerDisposable {
-  // ignore: prefer_function_declarations_over_variables
-  VoidCallback disposeCallBack = () {};
-  @override
-  void onDispose(void Function() cb) {
-    disposeCallBack = cb;
-  }
-
-  final List<ManagerProvider> _providers = [];
-  FutureManager<T> read<T extends Object>(ManagerProvider<T> provider, {Object? param}) {
-    if (_ManagerStore.store[provider] == null) {
-      provider._manager = provider._create(this, param);
-    }
-    _providers.add(provider);
-    _ManagerStore.addListener(provider);
-    return provider._manager as FutureManager<T>;
-  }
-
-  void _dispose() {
-    for (var provider in _providers) {
-      _ManagerStore.removeListener(provider, disposeCallBack);
-    }
-    _providers.clear();
-  }
-}
-
-class _ManagerStore {
-  static final Map<ManagerProvider, int> store = {};
-
-  static void addListener<T extends Object>(ManagerProvider<T> provider) {
-    store[provider] ??= 0;
-    store[provider] = store[provider]! + 1;
-  }
-
-  static void removeListener<T extends Object>(ManagerProvider<T> provider, VoidCallback onDispose) {
-    if (store[provider] == null) return;
-    store[provider] = store[provider]! - 1;
-    if (store[provider] == 0) {
-      onDispose.call();
-      provider._manager?.dispose();
-      store.remove(provider);
-    }
-  }
-}
-
-///Create a provider for [FutureManager]
-class ManagerProvider<T extends Object> {
-  FutureManager? _manager;
-  final FutureManager<T> Function(ManagerRef, Object?) _create;
-  ManagerProvider(this._create);
 }
 
 ///Extends this class instead of Stateless widget to access [ManagerRef]
@@ -86,5 +27,105 @@ class _ManagerConsumerState extends State<ManagerConsumer> with ManagerProviderM
   @override
   Widget build(BuildContext context) {
     return widget.build(context, ref);
+  }
+}
+
+class ManagerConsumerBuilder extends ManagerConsumer {
+  final Widget Function(BuildContext, ManagerRef) builder;
+  const ManagerConsumerBuilder({Key? key, required this.builder}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, ManagerRef ref) {
+    return builder(context, ref);
+  }
+}
+
+///
+abstract class _ManagerDisposable {
+  void onDispose(void Function() cb);
+}
+
+class ManagerRef extends _ManagerDisposable {
+  final List<ManagerProvider> _providers = [];
+  // ignore: prefer_function_declarations_over_variables
+  VoidCallback _disposeCallBack = () {};
+  @override
+  void onDispose(void Function() cb) {
+    _disposeCallBack = cb;
+  }
+
+  ///Read FutureManager from our store
+  FutureManager<T> read<T extends Object, P>(ManagerProvider<T, P> provider) {
+    if (!_ManagerStore.instance.providerExist(provider)) {
+      provider._manager = () {
+        if (provider.isFamily && provider._param == null) {
+          throw ("Please provide a param when you first time read a ManagerProvider.family");
+        }
+        return provider.isFamily ? provider._createFamily!(this, provider._param!) : provider._create!(this);
+      }();
+    }
+    _providers.add(provider);
+    _ManagerStore.instance.addListener(provider);
+    return provider._manager as FutureManager<T>;
+  }
+
+  ///This method is called when StatefulWidget that ManagerRef created is dispose
+  void _dispose() {
+    for (var provider in _providers) {
+      _ManagerStore.instance.removeListener(provider, _disposeCallBack);
+    }
+    _providers.clear();
+  }
+}
+
+class _ManagerStore {
+  _ManagerStore._();
+  static _ManagerStore instance = _ManagerStore._();
+  final Map<ManagerProvider, int> _store = {};
+
+  bool providerExist(ManagerProvider provider) {
+    return _store[provider] != null;
+  }
+
+  void addListener<T extends Object, P>(
+    ManagerProvider<T, P> provider,
+  ) {
+    _store[provider] ??= 0;
+    _store[provider] = _store[provider]! + 1;
+  }
+
+  void removeListener<T extends Object, P>(
+    ManagerProvider<T, P> provider,
+    VoidCallback onDispose,
+  ) {
+    if (_store[provider] == null) return;
+    _store[provider] = _store[provider]! - 1;
+    if (_store[provider] == 0) {
+      onDispose.call();
+      provider._manager?.dispose();
+      _store.remove(provider);
+    }
+  }
+}
+
+///Create a provider for [FutureManager]
+class ManagerProvider<T extends Object, P> {
+  FutureManager? _manager;
+  P? _param;
+  FutureManager<T> Function(ManagerRef)? _create;
+  FutureManager<T> Function(ManagerRef, P)? _createFamily;
+
+  final bool isFamily;
+  ManagerProvider(this._create) : isFamily = false;
+
+  ManagerProvider.family(this._createFamily) : isFamily = true;
+
+  ManagerProvider<T, P> call(P _param) {
+    this._param = _param;
+    return this;
+  }
+
+  FutureManager<T> of(ManagerRef ref) {
+    return ref.read(this);
   }
 }

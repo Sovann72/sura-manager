@@ -109,10 +109,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: const Text("Reset"),
                 ),
                 const SpaceY(24),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: const Text("Count listener"),
-                ),
               ],
             ),
           );

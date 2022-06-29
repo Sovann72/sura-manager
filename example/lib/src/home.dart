@@ -3,6 +3,7 @@ import 'package:sura_flutter/sura_flutter.dart';
 import 'package:sura_manager/sura_manager.dart';
 import 'package:sura_manager_example/src/cache_global_manager.dart';
 
+import 'test_manager_provider.dart';
 import 'test_pagination.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -97,8 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ElevatedButton(
                   key: const ValueKey("add-error"),
                   onPressed: () async {
-                    dataManager.addError(
-                        const FutureManagerError(exception: "exception"));
+                    dataManager.addError(const FutureManagerError(exception: "exception"));
                   },
                   child: const Text("Add error"),
                 ),
@@ -109,10 +109,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: const Text("Reset"),
                 ),
                 const SpaceY(24),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: const Text("Count listener"),
-                ),
               ],
             ),
           );
@@ -131,6 +127,16 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
             child: const Text("Pagination"),
+          ),
+          const SpaceX(16),
+          ElevatedButton(
+            onPressed: () {
+              SuraPageNavigator.push(
+                context,
+                const TestManagerProvider(),
+              );
+            },
+            child: const Text("Manager Provider"),
           ),
           const SpaceX(16),
           ElevatedButton(

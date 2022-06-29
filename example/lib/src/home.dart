@@ -57,12 +57,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         },
-        onError: (err) {
-          //debugdebugPrint("We got an error: $err");
-        },
-        onData: (data) {
-          SuraPageNavigator.push(context, const CacheGlobalManager());
-        },
+        onError: (err) {},
+        onData: (data) {},
         ready: (context, data) {
           return Center(
             child: Column(

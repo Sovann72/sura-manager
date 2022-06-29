@@ -4,8 +4,7 @@ import 'package:sura_manager/sura_manager.dart';
 import 'package:sura_manager_example/src/home.dart';
 
 void main() {
-  testWidgets('FutureManagerBuilder test all state',
-      (WidgetTester tester) async {
+  testWidgets('FutureManagerBuilder test all state', (WidgetTester tester) async {
     const twosecond = Duration(seconds: 2);
 
     final FutureManager<int> manager = FutureManager(reloading: true);
@@ -58,10 +57,18 @@ void main() {
     expect(manager.data == null, true);
     expect(manager.error!.exception.runtimeType, String);
 
+    ///Refresh from Error
+    await tester.tap(find.text("Refresh"));
+    await tester.pump();
+    expect(find.byType(RefreshProgressIndicator), findsOneWidget);
+    expect(find.text("20"), findsNothing);
+    await tester.pump(twosecond);
+    expect(find.text("10"), findsOneWidget);
+
     //Reset
-    // await tester.tap(find.byKey(const ValueKey("reset")));
-    // await tester.pump();
-    // expect(find.text("10"), findsNothing);
-    // expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey("reset")));
+    await tester.pump();
+    expect(find.text("10"), findsNothing);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 }

@@ -148,6 +148,6 @@ class _HomePageState extends State<NewPage> {
 ## Ecosystem and usage
 
 - Q: when to use `cacheOption`? 
-A: When you have a global manager and want to preserve data on a period of time without running asyncOpertion's logic or futureFunction again.
+A: When you have a global manager and want to preserve data on a period of time without running asyncOperation logic or futureFunction again.
 - Q: when to use `ManagerProvider`?
-A: When you want to use FutureManager accross multiple widget(but not global) without declaring it as a global variable. By doing this, FutureManager will be auto dispose and recreate each time its first used. This work the same way as Riverpod with autoDispose.
+A: When you want to use FutureManager across multiple widget(but not global) without declaring it as a global variable. By doing this, FutureManager will be auto dispose and recreate each time its first used. This work the same way as Riverpod with autoDispose.

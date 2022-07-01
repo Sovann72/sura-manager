@@ -1,4 +1,4 @@
-## [1.5.0] - 0 June 2022
+## [1.5.0] - 1 July 2022
 
 - Add Provider mechanism for FutureManager
    - `ManagerProvider`: Create a provider for FutureManager
